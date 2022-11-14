@@ -1,0 +1,49 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">iman scout</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="enter_password"> كلمة السر</string>
+    <string name="email"> البريد الألكتروني</string>
+    <string name="onsor">  العناصر</string>
+    <string name="home">الرئيسية</string>
+    <string name="talaa">الطلائع  </string>
+    <string name="enter_taliaa_name">أدخل أسم الطليعة </string>
+    <string name="add">أضف </string>
+    <string name="name">الأسم </string>
+    <string name="date_of_birth">تاريخ ميلاد العنصر </string>
+    <string name="blood_type">فئة الدم </string>
+    <string name="number">رقم الهاتف </string>
+    <string name="father_blood_type"> فئة الدم(للأب)</string>
+    <string name="father_number">رقم الهاتف (للأب) </string>
+    <string name="father_work">عمل الأب </string>
+
+    <string name="mother_blood_type"> فئة الدم(للأم)</string>
+    <string name="mother_number">رقم الهاتف (للأم) </string>
+    <string name="mother_work">عمل الأم </string>
+    <string name="search" tools:ignore="ExtraTranslation">ابحث</string>
+
+    <string name="place_Of_birth">السجل و مكان الولادة</string>
+    <string name="address">عنوان السكن الحالي</string>
+    <string name="nb_of_family">عدد أفراد الأسرة</string>
+    <string name="address_type">نوع السكن</string>
+    <string name="current_education">الدراسة الحالية</string>ؤ
+    <string name="hobbies">الهوايات</string>
+    <string name="is_there_insurance">هل يوجد ضمان اجتماعي?</string>
+    <string name="is_there_illness">هل يعاني من مرض مزمن  و يداوم على تناول دواء معين?</string>
+    <string name="require_text">يجب ملئ هذا الحقل</string>
+    <string name="invalid_email">البريد الألكتروني غير صالح</string>
+    <string name="image_require">يجب عليك اضافة صورة  </string>
+    <string name="ok">حسنا</string>
+    <string name="no">لا</string>
+    <string name="do_realy_want_do">هل تريد التنفيذ حقا ؟ </string>
+
+    <string name="did_you_have_clothe">هل يملك لباس كشفي ؟ </string>
+    <string name="user_added_success">تم اضافة العنصر بنجاح</string>
+    <string name="add_new_activity">أضف نشاط جديد</string>
+    <string name="user_was_checked">أ</string>
+
+    // error Msg
+    <string name="email_exist">هذا البريد موجود سابقا </string>
+    <string name="server_error">يوجد خطا متعلق بالسرفر</string>
+
+</resources>
