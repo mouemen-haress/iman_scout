@@ -87,12 +87,19 @@ public class UserCell extends HeadComponents {
     public void setData(JSONObject data) {
         super.setData(data);
         JSONObject user = JsonHelper.getJSONObject(data, "userId");
-        if (user != null) {
-            mNameLabel.setText(user.optString("Name"));
-            String avat = user.optString("file").split("\\\\")[1];
-            MImageLoader.loadWithGlide(D.ASSET_URL + "/" + avat, 0, mImage.getImage());
+        if (user == null) {
+            user = data;
         }
 
+        if(user!=null) {
+            mNameLabel.setText(user.optString("Name"));
+            String[] splitedAvater = user.optString("file").split("\\\\");
+            if (splitedAvater.length >= 2) {
+                String avat = splitedAvater[1];
+                MImageLoader.loadWithGlide(D.ASSET_URL + "/" + avat, 0, mImage.getImage());
+
+            }
+        }
 
     }
 }

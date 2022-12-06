@@ -49,24 +49,7 @@ public class UserManager {
         });
     }
 
-    public void addUserToTaliaa(String userId, CallBack callBack) {
 
-        JSONObject body = new JSONObject();
-        JsonHelper.put(body, "userId", userId);
-        ApiClient.getInstance().perFormeRequest(D.ADD_USER_TALIAA + "/" + D.mTaliaaObject.optString("_id"), body, new CallBack() {
-            @Override
-            public void onResult(String response) {
-                if (callBack != null) {
-                    if (response != null) {
-                        callBack.onResult(response);
-                    } else {
-                        callBack.onResult(null);
-                    }
-                }
-
-            }
-        });
-    }
 
     private JSONObject generateFakeUser(String phone, boolean makeTrue, UserModule model) {
         JSONObject body = new JSONObject();

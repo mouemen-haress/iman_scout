@@ -35,13 +35,8 @@ public class D {
     public final static String ADD_USER_TALIAA = "/add-user-taliaa";
 
 
-    // just for testing
-    public static String t = "";
-    public static JSONObject mActivityData;
-    public static JSONObject mTaliaaObject;
-
     //flag
-    public static final boolean IS_STIMILATE_ADD_USER_ENABLED = true;
+    public static final boolean IS_STIMILATE_ADD_USER_ENABLED = false;
 
 
     protected static HashMap<String, Integer> mResourceMap;

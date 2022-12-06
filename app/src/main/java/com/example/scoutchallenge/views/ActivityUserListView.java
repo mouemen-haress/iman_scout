@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
-import com.example.scoutchallenge.conponents.CircularImageView;
 import com.example.scoutchallenge.conponents.HeadComponents;
-import com.example.scoutchallenge.conponents.MDrawableEditText;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.conponents.MyRecyclerView;
-import com.example.scoutchallenge.conponents.popups.AddPopup;
 import com.example.scoutchallenge.conponents.popups.SelectUserPopup;
-import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.DateHelper;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.helpers.RecyclerItemClickListener;
@@ -34,7 +29,6 @@ import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.DidOnFinishWork;
 import com.example.scoutchallenge.interfaces.DidOnTap;
 import com.example.scoutchallenge.interfaces.OnCellSwipe;
-import com.example.scoutchallenge.network.MImageLoader;
 import com.example.scoutchallenge.views.cells.UserCell;
 
 import org.json.JSONArray;
@@ -45,7 +39,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
     protected MyRecyclerView mUserList;
     protected ActivityUserListView.ListAdapter mAdapter;
     protected LinearLayoutManager mMyManager;
-    private JSONObject mRelatedActivityObj;
+    protected JSONObject mRelatedObj;
     protected JSONArray mCurrentUserList;
     protected JSONArray mOtherUserList;
 
@@ -109,8 +103,8 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
         layoutViews();
     }
 
-    private void fillUsers() {
-        JSONObject data = mRelatedActivityObj;
+    protected void fillUsers() {
+        JSONObject data = mRelatedObj;
         if (data != null) {
             JSONArray userList = data.optJSONArray("users");
 
@@ -160,10 +154,13 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 
     @Override
     public void FillPassedData() {
-        String dataString = getArguments().getString("activityObj");
-        JSONObject obj = JsonHelper.parse(dataString);
-        if (obj != null) {
-            mRelatedActivityObj = obj;
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            String dataString = bundle.getString("activityObj");
+            JSONObject obj = JsonHelper.parse(dataString);
+            if (obj != null) {
+                mRelatedObj = obj;
+            }
         }
 
     }
@@ -197,7 +194,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 //                });
 //            }
 //        }
-        if (mRelatedActivityObj != null) {
+        if (mRelatedObj != null) {
             Tools.showAskingPopup(getString(R.string.do_realy_want_do), new DidOnTap() {
                 @Override
                 public void onTap(HeadComponents view) {
@@ -206,7 +203,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
                     JSONObject user = mAdapter.mDataSource.optJSONObject(position);
                     if (user != null) {
                         JSONObject userId = user.optJSONObject("userId");
-                        String activityId = mRelatedActivityObj.optString("_id");
+                        String activityId = mRelatedObj.optString("_id");
                         if (userId != null) {
                             String _id = userId.optString("_id");
                             if (!StringHelper.isNullOrEmpty(_id)) {
@@ -216,7 +213,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
                                         runOnUiThread(() -> {
                                             hideLockedLoading();
                                             mAdapter.mDataSource.remove(position);
-                                            mAdapter.notifyDataSetChanged();
+                                            fillUsers();
                                         });
                                     }
                                 });
@@ -237,26 +234,28 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 
     @Override
     public void onFinishWork(JSONArray array) {
-        if (array != null && mRelatedActivityObj != null) {
+        if (array != null && mRelatedObj != null) {
             int arrayLenght = array.length();
             showLockedLoading();
 
             for (int i = 0; i < arrayLenght; i++) {
                 String cuurentId = array.optString(i);
                 if (!StringHelper.isNullOrEmpty(cuurentId)) {
-                    String activityId = mRelatedActivityObj.optString("_id");
+                    String activityId = mRelatedObj.optString("_id");
                     if (!StringHelper.isNullOrEmpty(activityId)) {
                         int finalI = i;
+                        hidePopup();
+
                         BackendProxy.getInstance().mActivityManager.AddUserToActivity(activityId, cuurentId, new CallBack() {
                             @Override
                             public void onResult(String response) {
-                                if(finalI ==arrayLenght-1){
-                                    hidePopup();
-                                    hideLockedLoading();
-                                }
-                                if (response != null) {
-                                    runOnUiThread(() -> {
-                                        JSONArray lastUserArray = mRelatedActivityObj.optJSONArray("users");
+                                runOnUiThread(() -> {
+
+                                    if (finalI == arrayLenght - 1) {
+                                        hideLockedLoading();
+                                    }
+                                    if (response != null) {
+                                        JSONArray lastUserArray = mRelatedObj.optJSONArray("users");
                                         JSONObject targetUser = BackendProxy.getInstance().mUserManager.getUserById(cuurentId);
                                         if (targetUser != null) {
                                             JSONObject userIdObj = new JSONObject();
@@ -265,8 +264,10 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
                                         }
                                         fillUsers();
 
-                                    });
-                                }
+
+                                    }
+                                });
+
                             }
                         });
                     }
@@ -359,9 +360,12 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 
         if (mOtherUserList != null) {
             addUserPopup.setUserArray(mOtherUserList);
-            addUserPopup.mDelegate = this;
-            showPopup(addUserPopup);
-
+        } else {
+            addUserPopup.setUserArray(BackendProxy.getInstance().mUserManager.mAllUserList);
         }
+        addUserPopup.mDelegate = this;
+        showPopup(addUserPopup);
+
+
     }
 }

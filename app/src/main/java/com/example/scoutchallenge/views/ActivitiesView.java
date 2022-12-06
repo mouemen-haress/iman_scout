@@ -172,27 +172,28 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
             case AddPopup.ADD_TALIAA_POPUP:
                 MDrawableEditText mDrawableEditText = (MDrawableEditText) view;
                 showLockedLoading();
-                BackendProxy.getInstance().mActivityManager.addActivities(mDrawableEditText.getText(), D.t
-                        , new CallBack() {
-                            @Override
-                            public void onResult(String response) {
-                                runOnUiThread(() -> {
+                if (mRelatedCategoryObj != null) {
+                    BackendProxy.getInstance().mActivityManager.addActivities(mDrawableEditText.getText(), mRelatedCategoryObj.optString("_id")
+                            , new CallBack() {
+                                @Override
+                                public void onResult(String response) {
+                                    runOnUiThread(() -> {
 
-                                    hideLockedLoading();
-                                    hidePopup();
-                                    if (response != null) {
-                                        fillActivities();
-                                        mAdapter.notifyDataSetChanged();
+                                        hideLockedLoading();
+                                        hidePopup();
+                                        if (response != null) {
+                                            fillActivities();
+                                            mAdapter.notifyDataSetChanged();
 
-                                    } else {
-                                        showSimplePopup(getString(R.string.server_error));
-                                    }
+                                        } else {
+                                            showSimplePopup(getString(R.string.server_error));
+                                        }
 
-                                });
+                                    });
 
-                            }
-                        });
-
+                                }
+                            });
+                }
                 break;
             default:
                 break;

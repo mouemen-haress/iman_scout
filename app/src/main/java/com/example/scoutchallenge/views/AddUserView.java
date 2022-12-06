@@ -121,7 +121,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
     protected UserModule mModule;
     protected String mCurrentSelectedSection;
     private Uri mImageUri = null;
-    public int mSelectedTaliaaPosition = -1;
+    public int mSelectedTaliaaPosition = 0;
 
 
     @Override
@@ -435,11 +435,12 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
             mUserModule.setmRegisterNumber(mNumber.getText().trim());
             mUserModule.setmPersonalBloodType(mBloodType.getText().trim());
             mUserModule.setmHasClothes(mClothesSwitch.hasSelection());
-            if (true || mSelectedTaliaaPosition != -1) {
+            if (mSelectedTaliaaPosition != -1) {
                 JSONArray taliaaList = BackendProxy.getInstance().mTaliaaManager.mTaliaaList;
-                JSONObject taliaaObj = JsonHelper.getJSONObject(taliaaList, 0);
-
-                mUserModule.setTaliaaId(taliaaObj.optString("_id"));
+                if (taliaaList != null) {
+                    JSONObject taliaaObj = JsonHelper.getJSONObject(taliaaList, mSelectedTaliaaPosition);
+                    mUserModule.setTaliaaId(taliaaObj.optString("_id"));
+                }
 
             }
             mUserModule.setmFerkaName(mFatherName.getText().trim());

@@ -120,17 +120,17 @@ public class UserListComponent extends HeadComponents implements DidOnTap {
     public void onTap(HeadComponents view) {
         switch (view.getId()) {
             case AddPopup.ADD_TALIAA_POPUP:
-                MDrawableEditText mDrawableEditText = (MDrawableEditText) view;
-                BackendProxy.getInstance().mActivityManager.addActivities(mDrawableEditText.getText(), D.t
-                        , new CallBack() {
-                            @Override
-                            public void onResult(String response) {
-                                runOnUiThread(() -> {
-                                    mAdapter.notifyDataSetChanged();
-
-                                });
-                            }
-                        });
+//                MDrawableEditText mDrawableEditText = (MDrawableEditText) view;
+//                BackendProxy.getInstance().mActivityManager.addActivities(mDrawableEditText.getText(), D.t
+//                        , new CallBack() {
+//                            @Override
+//                            public void onResult(String response) {
+//                                runOnUiThread(() -> {
+//                                    mAdapter.notifyDataSetChanged();
+//
+//                                });
+//                            }
+//                        });
 
                 break;
             default:

@@ -72,7 +72,6 @@ public class HomeView extends HeadView {
             @Override
             public void onItemClick(View view, int position) {
                 JSONObject currentObj = (JSONObject) mAdapter.mDataSource.opt(position);
-                D.t = currentObj.optString("_id");
                 Bundle bundle = new Bundle();
                 bundle.putString("categoryObj",currentObj.toString());
                 if (currentObj != null) {

@@ -148,4 +148,23 @@ public class TaliaaManager {
             }
         }
     }
+
+    public void addUserToTaliaa(String userId,String taliaaId, CallBack callBack) {
+
+        JSONObject body = new JSONObject();
+        JsonHelper.put(body, "userId", userId);
+        ApiClient.getInstance().perFormeRequest(D.ADD_USER_TALIAA + "/" +taliaaId, body, new CallBack() {
+            @Override
+            public void onResult(String response) {
+                if (callBack != null) {
+                    if (response != null) {
+                        callBack.onResult(response);
+                    } else {
+                        callBack.onResult(null);
+                    }
+                }
+
+            }
+        });
+    }
 }

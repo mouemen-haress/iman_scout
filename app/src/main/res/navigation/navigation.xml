@@ -70,4 +70,8 @@
         android:id="@+id/showUserInfoView"
         android:name="com.example.scoutchallenge.views.ShowUserInfoView"
         android:label="ShowUserInfoView" />
+    <fragment
+        android:id="@+id/taliaaUserListView"
+        android:name="com.example.scoutchallenge.views.TaliaaUserListView"
+        android:label="TaliaaUserListView" />
 </navigation>

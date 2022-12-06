@@ -2,6 +2,7 @@ package com.example.scoutchallenge.views;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -54,9 +55,10 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
             public void onItemClick(View view, int position) {
                 JSONObject currentObj = (JSONObject) mAdapter.mDataSource.opt(position);
                 JSONArray taliaaList = BackendProxy.getInstance().mTaliaaManager.mTaliaaList;
-                if (taliaaList != null) {
-                    D.mTaliaaObject = currentObj;
-                    pushView(R.id.ActivityuserListView);
+                if (taliaaList != null && currentObj != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("relatedTaliaaObj", currentObj.toString());
+                    pushView(R.id.taliaaUserListView,bundle);
                 }
             }
 
@@ -130,6 +132,7 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
             case AddPopup.ADD_TALIAA_POPUP:
                 MDrawableEditText mDrawableEditText = (MDrawableEditText) view;
                 showLockedLoading();
+                hidePopup();
                 BackendProxy.getInstance().mTaliaaManager.addTaliaa(mDrawableEditText.getText(), new CallBack() {
                     @Override
                     public void onResult(String response) {
