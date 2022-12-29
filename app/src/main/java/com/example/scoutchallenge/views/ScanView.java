@@ -1,6 +1,7 @@
 package com.example.scoutchallenge.views;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
@@ -9,6 +10,10 @@ import androidx.annotation.NonNull;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.example.scoutchallenge.R;
+import com.example.scoutchallenge.backend.BackendProxy;
+import com.example.scoutchallenge.helpers.StringHelper;
+import com.example.scoutchallenge.models.UserModule;
 import com.google.zxing.Result;
 
 public class ScanView extends HeadView {
@@ -25,7 +30,16 @@ public class ScanView extends HeadView {
             @Override
             public void onDecoded(@NonNull final Result result) {
                 runOnUiThread(() -> {
-                    Toast.makeText(getContext(), result.getText(), Toast.LENGTH_SHORT).show();
+                    String resultText = result.getText();
+                    if (!StringHelper.isNullOrEmpty(resultText)) {
+                        UserModule userModel = new UserModule();
+                        userModel = BackendProxy.getInstance().mUserManager.getUserBySerialNumber(resultText);
+                        if (userModel != null && userModel.getData() != null) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("userObj", userModel.getData().toString());
+                            pushView(R.id.showUserInfoView, bundle);
+                        }
+                    }
                 });
             }
         });

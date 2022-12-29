@@ -32,7 +32,8 @@ import com.example.scoutchallenge.helpers.StringHelper;
 import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.DidOnFinishWork;
 import com.example.scoutchallenge.interfaces.DidOnTap;
-import com.example.scoutchallenge.modules.UserModule;
+import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.network.MImageLoader;
 import com.google.zxing.Result;
 
 import org.json.JSONArray;
@@ -85,14 +86,15 @@ public class SelectUserPopup extends HeadComponents {
         mAddBtn.setOnTapListener(new DidOnTap() {
             @Override
             public void onTap(HeadComponents view) {
-             if(mDelegate!=null){
-                 mDelegate.onFinishWork(getSelectedUsers());
-             }
+                if (mDelegate != null) {
+                    mDelegate.onFinishWork(getSelectedUsers());
+                }
             }
         });
 
         mScanBtn = new MImageComponent(ctx);
         mScanBtn.setImageResource(getImage("qr_code"));
+        mScanBtn.getImage().setColorFilter(getColor(R.color.hint));
         mHeadContainer.addView(mScanBtn);
         mScanBtn.setOnTapListener(new DidOnTap() {
             @Override
@@ -269,8 +271,8 @@ public class SelectUserPopup extends HeadComponents {
                 JSONObject user = mUserArray.optJSONObject(i);
                 if (user != null) {
                     UserModule model = new UserModule();
-                    model.mData = user;
-                    if (model.getmId().equalsIgnoreCase(text)) {
+                    model.setData(user);
+                    if (model.getmSerialNumber().equalsIgnoreCase(text)) {
                         if (user.optBoolean("isChecked")) {
                             Tools.showSimplePopup("هذا العنصر مضاف مسبقا");
                         } else {
@@ -409,6 +411,8 @@ public class SelectUserPopup extends HeadComponents {
         protected MImageComponent mCheckIcon;
         protected boolean isChecked = false;
 
+        protected UserModule userModule = new UserModule();
+
         public UserSelectionCell(@NonNull Context context, AttributeSet attrs) {
             super(context, attrs);
         }
@@ -429,11 +433,11 @@ public class SelectUserPopup extends HeadComponents {
             mNameLabel.setText("ديب شموط");
             mNameLabel.setTextSize(18);
             mNameLabel.getLabel().setGravity(Gravity.CENTER);
-            mNameLabel.setTextColor(getColor(R.color.white));
-            mNameLabel.setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.headColor, dpToPx(10), -1, -1));
+            mNameLabel.setTextColor(getColor(R.color.hint));
             addView(mNameLabel);
 
             mCheckIcon = new MImageComponent(ctx);
+            mCheckIcon.getImage().setColorFilter(getColor(R.color.headColor));
             mCheckIcon.setOnTapListener(new DidOnTap() {
                 @Override
                 public void onTap(HeadComponents view) {
@@ -445,7 +449,7 @@ public class SelectUserPopup extends HeadComponents {
             GradientDrawable gradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), -1, -1);
             gradientDrawable.setStroke(3, getColor(R.color.secondColor));
             setBackground(gradientDrawable);
-            setElevation(8);
+            setElevation(2);
 
             layoutViews();
         }
@@ -488,15 +492,17 @@ public class SelectUserPopup extends HeadComponents {
         @Override
         public void setData(JSONObject data) {
             super.setData(data);
-
-            mNameLabel.setText(data.optString("Name"));
+            if (data != null) {
+                userModule.setData(data);
+                mNameLabel.setText(data.optString("Name"));
 //            String avat = data.optString("file").split("\\\\")[1];
 //            MImageLoader.loadWithGlide(D.ASSET_URL + "/" + avat, 0, mImage.getImage());
 
 //            MImageLoader.loadWithGlide(avat, 0, mImage.getImage());
-            mNameLabel.setText(data.optString("Name"));
-            mImage.setImageResource(R.drawable.onsor);
-            handleChecking(false);
+                mNameLabel.setText(data.optString("Name"));
+                MImageLoader.loadWithGlide(userModule.getImageUrl(), 0, mImage.getImage());
+                handleChecking(false);
+            }
         }
 
         public void handleChecking(boolean isToToggle) {

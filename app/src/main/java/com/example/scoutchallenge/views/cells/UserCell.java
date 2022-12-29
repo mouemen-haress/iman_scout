@@ -14,13 +14,19 @@ import com.example.scoutchallenge.conponents.HeadComponents;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
+import com.example.scoutchallenge.models.UserModule;
 import com.example.scoutchallenge.network.MImageLoader;
 
 import org.json.JSONObject;
 
 public class UserCell extends HeadComponents {
+
+    public UserModule userModule = new UserModule();
     protected CircularImageView mImage;
     protected MTextView mNameLabel;
+    protected MTextView mUserInfo;
+    protected HeadComponents mLine;
+
 
     public UserCell(@NonNull Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -42,16 +48,25 @@ public class UserCell extends HeadComponents {
         mNameLabel.setText("ديب شموط");
         mNameLabel.setTextSize(18);
         mNameLabel.getLabel().setGravity(Gravity.CENTER);
-        mNameLabel.setTextColor(getColor(R.color.white));
-        mNameLabel.setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.headColor, dpToPx(10), -1, -1));
+        mNameLabel.setTextColor(getColor(R.color.headColor));
         addView(mNameLabel);
 
+        mUserInfo = new MTextView(ctx);
+        mUserInfo.setText("ديب شموط");
+        mUserInfo.setTextSize(14);
+        mUserInfo.getLabel().setGravity(Gravity.CENTER);
+        mUserInfo.setTextColor(getColor(R.color.hint));
+        addView(mUserInfo);
 
-        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), -1, -1);
+        mLine = new HeadComponents(ctx);
+        mLine.setBackgroundColor(getColor(R.color.headColor));
+        addView(mLine);
+
+        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.white, -1, -1, -1);
         gradientDrawable.setStroke(3, getColor(R.color.secondColor));
         setBackground(gradientDrawable);
-        setElevation(8);
 
+        setElevation(2);
         layoutViews();
     }
 
@@ -69,12 +84,24 @@ public class UserCell extends HeadComponents {
 
 
         params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
+        params.gravity = Gravity.START;
         params.setMarginStart(iconSize + margin * 2);
+        params.topMargin = margin * 2;
         params.setMarginEnd(margin / 2);
-        mNameLabel.setPadding(twoDp, twoDp, twoDp, twoDp);
         mNameLabel.setLayoutParams(params);
 
+        params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.START;
+        params.setMarginStart(iconSize + margin * 2);
+        params.topMargin = margin * 4;
+        params.setMarginEnd(margin / 2);
+        params.bottomMargin = margin;
+        mUserInfo.setLayoutParams(params);
+
+
+        params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(2));
+        params.gravity = Gravity.BOTTOM;
+        mLine.setLayoutParams(params);
 
         params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = margin;
@@ -86,18 +113,18 @@ public class UserCell extends HeadComponents {
     @Override
     public void setData(JSONObject data) {
         super.setData(data);
-        JSONObject user = JsonHelper.getJSONObject(data, "userId");
-        if (user == null) {
-            user = data;
-        }
+        if (data != null) {
+            JSONObject user = JsonHelper.getJSONObject(data, "userId");
+            if (user == null) {
+                user = data;
+                userModule.setData(user);
 
-        if(user!=null) {
-            mNameLabel.setText(user.optString("Name"));
-            String[] splitedAvater = user.optString("file").split("\\\\");
-            if (splitedAvater.length >= 2) {
-                String avat = splitedAvater[1];
-                MImageLoader.loadWithGlide(D.ASSET_URL + "/" + avat, 0, mImage.getImage());
+            }
 
+            if (user != null) {
+                mNameLabel.setText(userModule.getmName());
+                MImageLoader.loadWithGlide(userModule.getImageUrl(), 0, mImage.getImage());
+                mUserInfo.setText(userModule.getTaliaaName() + "." + userModule.getmDateOfBirth() + "." + userModule.getmAddress());
             }
         }
 

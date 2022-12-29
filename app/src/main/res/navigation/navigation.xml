@@ -68,7 +68,7 @@
         android:label="UserListView" />
     <fragment
         android:id="@+id/showUserInfoView"
-        android:name="com.example.scoutchallenge.views.ShowUserInfoView"
+        android:name="com.example.scoutchallenge.views.UserInfoView"
         android:label="ShowUserInfoView" />
     <fragment
         android:id="@+id/taliaaUserListView"

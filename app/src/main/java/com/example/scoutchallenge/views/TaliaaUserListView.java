@@ -2,11 +2,19 @@ package com.example.scoutchallenge.views;
 
 import android.os.Bundle;
 
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.scoutchallenge.App;
+import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
-import com.example.scoutchallenge.helpers.DateHelper;
+import com.example.scoutchallenge.conponents.HeadComponents;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.helpers.StringHelper;
+import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.CallBack;
+import com.example.scoutchallenge.interfaces.DidOnTap;
+import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.utils.NotificationCenter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,6 +42,7 @@ public class TaliaaUserListView extends ActivityUserListView {
             if (userList != null) {
                 mCurrentUserList = userList;
                 mAdapter.mDataSource = userList;
+                mOtherUserList = BackendProxy.getInstance().mUserManager.getOtherUser(mCurrentUserList);
                 mAdapter.notifyDataSetChanged();
 
             }
@@ -41,6 +50,79 @@ public class TaliaaUserListView extends ActivityUserListView {
             String title = data.optString("name");
             mHeaderText.setText(title);
         }
+
+
+    }
+
+    @Override
+    public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+        int position = viewHolder.getAdapterPosition();
+        JSONObject user = mAdapter.mDataSource.optJSONObject(position);
+
+        Tools.showAskingPopup(getString(R.string.do_realy_want_do), new DidOnTap() {
+            @Override
+            public void onTap(HeadComponents view) {
+                if (user != null) {
+                    UserModule userModule = new UserModule();
+                    userModule.setData(user);
+                    String id = userModule.getId();
+                    showLockedLoading();
+                    BackendProxy.getInstance().mUserManager.deleteUserFromTaliaa(id, new CallBack() {
+                        @Override
+                        public void onResult(String response) {
+                            if (response != null) {
+                                runOnUiThread(() -> {
+                                    JSONArray lastUserArray = mRelatedObj.optJSONArray("users");
+                                    int removedIndex = -1;
+                                    for (int i = 0; i < lastUserArray.length(); i++) {
+                                        JSONObject currentUser = lastUserArray.optJSONObject(i);
+                                        if (currentUser != null) {
+                                            UserModule userModule1 = new UserModule();
+                                            userModule1.setData(currentUser);
+                                            String userId = userModule1.getId();
+                                            if (userId.equalsIgnoreCase(id)) {
+                                                removedIndex = i;
+                                                break;
+                                            }
+                                        }
+
+                                    }
+                                    if (removedIndex >= 0) {
+                                        lastUserArray.remove(removedIndex);
+                                        mAdapter.notifyDataSetChanged();
+
+                                        App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
+                                            @Override
+                                            public void onResult(String response) {
+                                                hideLockedLoading();
+
+                                            }
+                                        });
+
+                                    } else {
+                                        hideLockedLoading();
+                                    }
+                                });
+                            } else {
+                                hideLockedLoading();
+                                showSimplePopup(getString(R.string.server_error));
+
+                            }
+                        }
+                    });
+
+                }
+            }
+        }, new
+
+                DidOnTap() {
+                    @Override
+                    public void onTap(HeadComponents view) {
+                        runOnUiThread(() -> {
+                            mAdapter.notifyDataSetChanged();
+                        });
+                    }
+                });
 
 
     }
@@ -64,17 +146,27 @@ public class TaliaaUserListView extends ActivityUserListView {
                             public void onResult(String response) {
                                 runOnUiThread(() -> {
 
-                                    if (finalI == arrayLenght - 1) {
-                                        hideLockedLoading();
-                                    }
                                     if (response != null) {
                                         JSONArray lastUserArray = mRelatedObj.optJSONArray("users");
                                         JSONObject targetUser = BackendProxy.getInstance().mUserManager.getUserById(cuurentId);
                                         if (targetUser != null) {
+                                            UserModule targetUserModule = new UserModule();
+                                            targetUserModule.setData(targetUser);
+                                            targetUserModule.setTaliaaId(taliaaId);
+
                                             lastUserArray.put(targetUser);
                                         }
-                                        fillUsers();
-
+                                        runOnUiThread(() -> {
+                                            fillUsers();
+                                        });
+                                        if (finalI == arrayLenght - 1) {
+                                            App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
+                                                @Override
+                                                public void onResult(String response) {
+                                                    hideLockedLoading();
+                                                }
+                                            });
+                                        }
 
                                     }
                                 });
@@ -87,4 +179,25 @@ public class TaliaaUserListView extends ActivityUserListView {
             }
         }
     }
+
+    private void updateRelatedObject() {
+        if (mRelatedObj != null) {
+            String id = mRelatedObj.optString("_id");
+            JSONObject tempObject = BackendProxy.getInstance().mTaliaaManager.getTaliaaById(id);
+            if (tempObject != null) {
+                mRelatedObj = tempObject;
+            }
+        }
+    }
+
+
+    @Override
+    public void onNotification(String notificationType, JSONObject data) {
+        super.onNotification(notificationType, data);
+        if(notificationType.equalsIgnoreCase(NotificationCenter.USERS_LIST_UPDATED)){
+        updateRelatedObject();
+        fillUsers();}
+    }
+
+
 }

@@ -301,4 +301,8 @@ public class MDrawableEditText extends HeadComponents {
         return mHint;
     }
 
+    public void setText(String text) {
+        mEditText.getEditText().setText(text);
+    }
+
 }

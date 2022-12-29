@@ -1,11 +1,15 @@
 package com.example.scoutchallenge.backend;
 
+import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
+import com.example.scoutchallenge.models.TaliaaModel;
+import com.example.scoutchallenge.models.UserModule;
 import com.example.scoutchallenge.network.ApiClient;
 import com.example.scoutchallenge.utils.LocalStorage;
+import com.example.scoutchallenge.utils.NotificationCenter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -76,17 +80,19 @@ public class TaliaaManager {
         ApiClient.getInstance().perFormeRequest(D.GET_TALIAA + "/" + squadId, null, new CallBack() {
             @Override
             public void onResult(String response) {
-                if (callBack != null) {
-                    if (response != null) {
-                        JSONObject object = JsonHelper.parse(response);
-                        if (object != null) {
-                            JSONArray squad = object.optJSONArray("taliaa");
-                            if (squad != null) {
-                                mTaliaaList = squad;
+                if (response != null) {
+                    JSONObject object = JsonHelper.parse(response);
+                    if (object != null) {
+                        JSONArray squad = object.optJSONArray("taliaa");
+                        if (squad != null) {
+                            mTaliaaList = squad;
+
+                            if (callBack != null) {
                                 callBack.onResult(mTaliaaList);
-                                return;
                             }
+                            return;
                         }
+
                     }
                 }
                 if (callBack != null) {
@@ -131,29 +137,37 @@ public class TaliaaManager {
         return null;
     }
 
-    public void deleteTaliaaLocaly(JSONObject taliaa) {
+    public void   deleteTaliaaLocaly(JSONObject taliaa) {
         int targetPosition = -1;
+        JSONObject currentTaliaaObj = null;
         if (mTaliaaList != null) {
             for (int i = 0; i < mTaliaaList.length(); i++) {
-                JSONObject currentTaliaaObj = mTaliaaList.optJSONObject(i);
+                currentTaliaaObj = mTaliaaList.optJSONObject(i);
                 if (currentTaliaaObj != null) {
                     String id = currentTaliaaObj.optString("_id");
-                    if (id.equalsIgnoreCase("_id")) {
+                    if (id.equalsIgnoreCase(taliaa.optString("_id"))) {
                         targetPosition = i;
+                        break;
                     }
                 }
             }
             if (targetPosition != -1) {
-                mTaliaaList.remove(targetPosition);
+                if (currentTaliaaObj != null) {
+                    JSONArray userList = currentTaliaaObj.optJSONArray("users");
+                    mTaliaaList.remove(targetPosition);
+                    moveUserToOtherTaliaaLocaly(userList);
+                }
             }
         }
     }
 
-    public void addUserToTaliaa(String userId,String taliaaId, CallBack callBack) {
+
+
+    public void addUserToTaliaa(String userId, String taliaaId, CallBack callBack) {
 
         JSONObject body = new JSONObject();
         JsonHelper.put(body, "userId", userId);
-        ApiClient.getInstance().perFormeRequest(D.ADD_USER_TALIAA + "/" +taliaaId, body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest(D.ADD_USER_TALIAA + "/" + taliaaId, body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (callBack != null) {
@@ -166,5 +180,53 @@ public class TaliaaManager {
 
             }
         });
+    }
+
+
+    public JSONObject getTaliaaById(String id) {
+        if (mTaliaaList != null) {
+            for (int i = 0; i < mTaliaaList.length(); i++) {
+                JSONObject currentTaliaaObj = mTaliaaList.optJSONObject(i);
+                if (currentTaliaaObj != null && currentTaliaaObj.optString("_id").equalsIgnoreCase(id)) {
+                    return currentTaliaaObj;
+
+                }
+            }
+            return null;
+        }
+
+        return new JSONObject();
+    }
+
+    public void moveUserToOtherTaliaaLocaly(JSONArray users) {
+        if (users == null) {
+            return;
+        }
+        JSONObject otherTaliaa = null;
+        TaliaaModel otherTaliaaModel = new TaliaaModel();
+        for (int i = 0; i < mTaliaaList.length(); i++) {
+            JSONObject currentTaliaaObj = mTaliaaList.optJSONObject(i);
+            if (currentTaliaaObj != null) {
+                TaliaaModel taliaaModel = new TaliaaModel();
+                taliaaModel.mData = currentTaliaaObj;
+                if (taliaaModel.getName().equalsIgnoreCase(TaliaaModel.OTHER)) {
+                    otherTaliaa = currentTaliaaObj;
+                    otherTaliaaModel.mData = otherTaliaa;
+                }
+            }
+        }
+        if (otherTaliaa != null) {
+            for (int i = 0; i < users.length(); i++) {
+                JSONObject currentUSer = users.optJSONObject(i);
+                if (currentUSer != null) {
+                    UserModule userModule = new UserModule();
+                    userModule.setData(currentUSer);
+                    userModule.setTaliaaId(otherTaliaaModel.get_id());
+                    userModule.setTaliaaName(otherTaliaaModel.getName());
+                }
+            }
+            App.getSharedInstance().getMainActivity().injectTaliaaUSerDataLocaly(null);
+            NotificationCenter.getInstance().fireNotificaion(NotificationCenter.USERS_LIST_UPDATED);
+        }
     }
 }

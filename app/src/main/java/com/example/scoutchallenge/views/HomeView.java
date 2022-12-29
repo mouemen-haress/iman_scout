@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.HeadComponents;
@@ -23,6 +24,7 @@ import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.RecyclerItemClickListener;
 import com.example.scoutchallenge.helpers.StringHelper;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
+import com.example.scoutchallenge.models.MemberModule;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -63,6 +65,10 @@ public class HomeView extends HeadView {
 
         mAdapter = new ListAdapter();
 
+        if (Core.getInstance().isHelpingLeader()) {
+            setMenu(MemberModule.HELPING_LEADER);
+        }
+
         mMyManager = new GridLayoutManager(getContext(), RecyclerView.VERTICAL);
         mMyManager.setSpanCount(2);
         mChallengeList = new RecyclerView(ctx);
@@ -73,9 +79,9 @@ public class HomeView extends HeadView {
             public void onItemClick(View view, int position) {
                 JSONObject currentObj = (JSONObject) mAdapter.mDataSource.opt(position);
                 Bundle bundle = new Bundle();
-                bundle.putString("categoryObj",currentObj.toString());
+                bundle.putString("categoryObj", currentObj.toString());
                 if (currentObj != null) {
-                    pushView(R.id.activitiesView,bundle);
+                    pushView(R.id.activitiesView, bundle);
                 }
             }
 
@@ -215,25 +221,24 @@ public class HomeView extends HeadView {
             mName.setTextColor(getColor(R.color.headColor));
             addView(mName);
 
-            setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), -1, -1));
-            setElevation(12);
+            setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), 2,getColor( R.color.headColor)));
             layoutViews();
         }
 
         public void layoutViews() {
 
             int iconSize = dpToPx(50);
-
             int margin = dpToPx(16);
+
 
             LayoutParams params = new LayoutParams(iconSize, iconSize);
             params.gravity = Gravity.CENTER;
             mIcon.setLayoutParams(params);
 
-            params = new LayoutParams(mCellSize, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.gravity = Gravity.CENTER;
+            params = new LayoutParams(mCellSize, ViewGroup.LayoutParams.MATCH_PARENT);
             mName.getLabel().setGravity(Gravity.CENTER);
-            params.topMargin = iconSize + margin / 2;
+            params.bottomMargin = margin/2;
+            params.topMargin = iconSize + (mCellSize/2)- iconSize/2;
             mName.setLayoutParams(params);
 
             params = new LayoutParams(mCellSize, mCellSize);
@@ -263,6 +268,11 @@ public class HomeView extends HeadView {
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
         pushView(R.id.scanView);
+    }
+
+    @Override
+    public void onNotification(String notificationType, JSONObject data) {
+        super.onNotification(notificationType, data);
     }
 }
 

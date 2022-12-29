@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.backend.LoginManager;
@@ -19,13 +18,8 @@ import com.example.scoutchallenge.conponents.MButtonComponent;
 import com.example.scoutchallenge.conponents.MDrawableEditText;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.conponents.components_Group.registerNumberPopup;
-import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.DidOnTap;
-import com.example.scoutchallenge.modules.MemberModule;
-import com.example.scoutchallenge.utils.LocalStorage;
-
-import org.json.JSONObject;
 
 
 public class LoginView extends HeadView {
@@ -111,9 +105,12 @@ public class LoginView extends HeadView {
             String email = mEmailEditText.getText().trim();
             String password = mPasswordEditText.getText().trim();
 
+            //leader
             email = "alloush32@live.com";
             password = "alloush32";
 
+//            email = "helping32@live.com";
+//            password = "helping32";
             BackendProxy.getInstance().mLoginManager.authenticate(email, password, new CallBack() {
                 @Override
                 public void onResult(String response) {

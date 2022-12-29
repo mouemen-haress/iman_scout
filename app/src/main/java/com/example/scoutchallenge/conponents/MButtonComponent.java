@@ -31,10 +31,9 @@ public class MButtonComponent extends HeadComponents {
 
         mGradientDrawable = new GradientDrawable();
         mGradientDrawable.setShape(GradientDrawable.RECTANGLE);
-        mGradientDrawable.setColor(Color.BLACK);
+        mGradientDrawable.setColor(getColor(R.color.headColor));
         mGradientDrawable.setCornerRadius(dpToPx(20));
 
-        setElevation(9);
         this.setBackground(mGradientDrawable);
 
         layoutViews();
@@ -51,10 +50,9 @@ public class MButtonComponent extends HeadComponents {
 
         mGradientDrawable = new GradientDrawable();
         mGradientDrawable.setShape(GradientDrawable.RECTANGLE);
-        mGradientDrawable.setColor(Color.BLACK);
+        mGradientDrawable.setColor(getColor(R.color.headColor));
         mGradientDrawable.setCornerRadius(dpToPx(20));
 
-        setElevation(9);
         this.setBackground(mGradientDrawable);
 
         layoutViews();

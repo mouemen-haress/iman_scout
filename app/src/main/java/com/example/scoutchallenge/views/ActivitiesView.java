@@ -55,6 +55,7 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
     }
 
     @Override
@@ -77,6 +78,7 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
         mAvtivitiesList.mMyList.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), mAvtivitiesList.mMyList, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+
                 JSONObject currentObj = (JSONObject) mAdapter.mDataSource.opt(position);
                 if (currentObj != null) {
                     Bundle bundle = new Bundle();
@@ -92,6 +94,7 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
             }
         }));
         mRootView.addView(mAvtivitiesList);
+
 
 
         fillActivities();

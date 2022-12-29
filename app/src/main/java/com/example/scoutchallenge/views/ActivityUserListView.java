@@ -78,7 +78,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
         mHeaderText.setMultiLine(3);
         mHeaderText.getLabel().setHorizontallyScrolling(true);
         mHeaderText.setTextColor(getColor(R.color.headColor));
-        mHeaderText.setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), -1, -1));
+        mHeaderText.setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), 2, getColor(R.color.headColor)));
         mRootView.addView(mHeaderText);
 
         mUserList = new MyRecyclerView(ctx);
@@ -178,22 +178,6 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 
     @Override
     public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-//        int position = viewHolder.getAdapterPosition();
-//        JSONObject user = mAdapter.mDataSource.optJSONObject(position);
-//        if (user != null) {
-//            if (D.mActivityData != null) {
-//                String activityId = D.mActivityData.optString("_id");
-//            }
-//            String userId = user.optString("_id");
-//            if (userId != null) {
-//                BackendProxy.getInstance().mUserManager.deleteUserFromTaliaa(userId, new CallBack() {
-//                    @Override
-//                    public void onResult(String response) {
-//
-//                    }
-//                });
-//            }
-//        }
         if (mRelatedObj != null) {
             Tools.showAskingPopup(getString(R.string.do_realy_want_do), new DidOnTap() {
                 @Override
@@ -356,8 +340,12 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
-        SelectUserPopup addUserPopup = new SelectUserPopup(getContext());
 
+        if (mOtherUserList != null && mOtherUserList.length() == 0) {
+            showToast(getString(R.string.all_user_add));
+            return;
+        }
+        SelectUserPopup addUserPopup = new SelectUserPopup(getContext());
         if (mOtherUserList != null) {
             addUserPopup.setUserArray(mOtherUserList);
         } else {

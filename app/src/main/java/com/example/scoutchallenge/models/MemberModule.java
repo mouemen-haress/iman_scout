@@ -1,13 +1,16 @@
-package com.example.scoutchallenge.modules;
+package com.example.scoutchallenge.models;
 
+import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.StringHelper;
-import com.example.scoutchallenge.helpers.Tools;
+import com.example.scoutchallenge.network.MImageLoader;
 
 import org.json.JSONObject;
 
 public class MemberModule {
-    public static final String USER = "USER";
-    public static final String KAEEDD = "KAEEDD";
+    public static final String USER = "user";
+    public static final String LEADER = "leader";
+    public static final String HELPING_LEADER = "helping leader";
+
 
     protected String mSerialNumber;
     protected String mId;
@@ -22,6 +25,7 @@ public class MemberModule {
     protected boolean mHasClothes;
     protected String mSchool;
 
+    protected String mFatherName;
     protected String mFatherWork;
     protected String mFatherEmail;
     protected String mFhaterPhone;
@@ -47,8 +51,71 @@ public class MemberModule {
     protected String mIsHasOtherAssociation;
 
     protected String mPassword;
+    protected String mPosition;
 
-    public JSONObject mData;
+    protected String mFawjeId;
+    protected String mTaliaaId;
+    protected String mMoufawadyeId;
+
+    protected String mImageUrl;
+    protected String insurance;
+
+    public String getInsurance() {
+        return insurance;
+    }
+
+    public void setInsurance(String insurance) {
+        this.insurance = insurance;
+    }
+
+    public String getmFawjeId() {
+        return mFawjeId;
+    }
+
+    public String getImageUrl() {
+        if (mImageUrl != null) {
+            String[] splitedAvater = mImageUrl.split("\\\\");
+            if (splitedAvater.length >= 2) {
+                String avat = splitedAvater[1];
+                return D.ASSET_URL + "/" + avat;
+            }
+        }
+        return "";
+    }
+
+    public void setmImageUrl(String mImageUrl) {
+        this.mImageUrl = mImageUrl;
+    }
+
+    public void setmFawjeId(String mFawjeId) {
+        this.mFawjeId = mFawjeId;
+    }
+
+    public String getmTaliaaId() {
+        return mTaliaaId;
+    }
+
+    public void setmTaliaaId(String mTaliaaId) {
+        this.mTaliaaId = mTaliaaId;
+    }
+
+    public String getmMoufawadyeId() {
+        return mMoufawadyeId;
+    }
+
+    public void setmMoufawadyeId(String mMoufawadyeId) {
+        this.mMoufawadyeId = mMoufawadyeId;
+    }
+
+    public String getmPosition() {
+        return mPosition;
+    }
+
+    public void setmPosition(String mPosition) {
+        this.mPosition = mPosition;
+    }
+
+    protected JSONObject mData;
 
     public String getmPassword() {
         return mPassword;
@@ -66,8 +133,16 @@ public class MemberModule {
         this.mHasClothes = mHasClothes;
     }
 
+    public String getmFatherName() {
+        return mFatherName;
+    }
+
+    public void setmFatherName(String mFatherName) {
+        this.mFatherName = mFatherName;
+    }
+
     public String getmSerialNumber() {
-        if(StringHelper.isNullOrEmpty(mSerialNumber)){
+        if (StringHelper.isNullOrEmpty(mSerialNumber)) {
             return "";
         }
         return mSerialNumber;
@@ -78,10 +153,17 @@ public class MemberModule {
     }
 
     public String getmId() {
+        if (mData != null) {
+            return mData.optString("_id");
+        }
+
+        if (mId == null) {
+            mId = "";
+        }
         return mId;
     }
 
-    public void setmId(String mId) {
+    public void setId(String mId) {
         this.mId = mId;
     }
 

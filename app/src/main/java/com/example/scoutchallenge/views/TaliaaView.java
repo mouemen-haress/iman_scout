@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.HeadComponents;
@@ -20,19 +21,19 @@ import com.example.scoutchallenge.conponents.MDrawableEditText;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.conponents.MyRecyclerView;
 import com.example.scoutchallenge.conponents.popups.AddPopup;
-import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.RecyclerItemClickListener;
 import com.example.scoutchallenge.helpers.StringHelper;
-import com.example.scoutchallenge.interfaces.ArrayCallBack;
+import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.DidOnTap;
 import com.example.scoutchallenge.interfaces.OnCellSwipe;
+import com.example.scoutchallenge.utils.NotificationCenter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
-
+    public static final String OTEHER_TALIAA = "أخرى";
     protected MyRecyclerView mTaliaaList;
     protected TaliaaView.ListAdapter mAdapter;
     protected LinearLayoutManager mMyManager;
@@ -58,7 +59,7 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
                 if (taliaaList != null && currentObj != null) {
                     Bundle bundle = new Bundle();
                     bundle.putString("relatedTaliaaObj", currentObj.toString());
-                    pushView(R.id.taliaaUserListView,bundle);
+                    pushView(R.id.taliaaUserListView, bundle);
                 }
             }
 
@@ -87,13 +88,10 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
         int headerSize = logoSize / 2 + dpToPx(16);
 
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, headerSize);
-        mHeader.setLayoutParams(params);
-
-        params = new FrameLayout.LayoutParams(logoSize, logoSize);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(logoSize, logoSize);
         params.topMargin = headerSize - logoSize / 2;
         params.gravity = Gravity.CENTER_HORIZONTAL;
-        mLogo.setLayoutParams(params);
+        mActionBtn.setLayoutParams(params);
 
 
         params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -107,22 +105,43 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
     public void onSwipe(RecyclerView.ViewHolder viewHolder, int swipeDir) {
         int position = viewHolder.getAdapterPosition();
         JSONObject taliaa = mAdapter.mDataSource.optJSONObject(position);
+        String taliaaName = taliaa.optString("name");
+        if (taliaaName.equalsIgnoreCase(OTEHER_TALIAA)) {
+            showToast(getString(R.string.can_not_delete_this_taliaa));
+            fillDate();
+            return;
+        }
         if (taliaa != null) {
-            String taliaaID = taliaa.optString("_id");
-            String defaultTaliaaID = BackendProxy.getInstance().mTaliaaManager.getDefaultTaliaaId();
-            if (!StringHelper.isNullOrEmpty(defaultTaliaaID)) {
-                BackendProxy.getInstance().mTaliaaManager.deleteTaliaa(taliaaID, defaultTaliaaID, new CallBack() {
-                    @Override
-                    public void onResult(String response) {
-                        runOnUiThread(() -> {
-                            if (mAdapter != null) {
-                                BackendProxy.getInstance().mTaliaaManager.deleteTaliaaLocaly(taliaa);
-                                fillDate();
+            Tools.showAskingPopup(getString(R.string.do_realy_want_do), new DidOnTap() {
+                @Override
+                public void onTap(HeadComponents view) {
+                    showLockedLoading();
+                    String taliaaID = taliaa.optString("_id");
+                    String defaultTaliaaID = BackendProxy.getInstance().mTaliaaManager.getDefaultTaliaaId();
+                    if (!StringHelper.isNullOrEmpty(defaultTaliaaID)) {
+                        BackendProxy.getInstance().mTaliaaManager.deleteTaliaa(taliaaID, defaultTaliaaID, new CallBack() {
+                            @Override
+                            public void onResult(String response) {
+                                runOnUiThread(() -> {
+                                    hideLockedLoading();
+                                    if (mAdapter != null) {
+                                        BackendProxy.getInstance().mTaliaaManager.deleteTaliaaLocaly(taliaa);
+                                        fillDate();
+                                    }
+                                });
                             }
                         });
                     }
-                });
-            }
+                }
+            }, new DidOnTap() {
+                @Override
+                public void onTap(HeadComponents view) {
+                    runOnUiThread(() -> {
+                        mAdapter.notifyDataSetChanged();
+                    });
+                }
+            });
+
         }
     }
 
@@ -137,20 +156,22 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
                     @Override
                     public void onResult(String response) {
                         if (response != null) {
-                            BackendProxy.getInstance().mTaliaaManager.getTaliaaList(new ArrayCallBack() {
+                            App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
                                 @Override
-                                public void onResult(JSONArray array) {
+                                public void onResult(String response) {
                                     runOnUiThread(() -> {
                                         hideLockedLoading();
-                                        if (array != null) {
+                                        if (response != null) {
                                             fillDate();
                                         } else {
                                             showSimplePopup(getString(R.string.server_error));
                                         }
                                     });
-
                                 }
                             });
+
+
+
                         } else {
                             runOnUiThread(() -> {
                                 hideLockedLoading();
@@ -299,5 +320,18 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
         addTaliaaPopup.mDelegate = this;
         addTaliaaPopup.setOnTapListener(this);
         showPopup(addTaliaaPopup);
+    }
+
+    @Override
+    public void onNotification(String notificationType, JSONObject data) {
+        super.onNotification(notificationType, data);
+        switch (notificationType) {
+            case NotificationCenter.USERS_LIST_UPDATED:
+                runOnUiThread(() -> {
+                    fillDate();
+                });
+                break;
+
+        }
     }
 }

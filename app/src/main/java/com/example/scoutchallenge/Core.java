@@ -1,14 +1,24 @@
 package com.example.scoutchallenge;
 
-import com.example.scoutchallenge.modules.MemberModule;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.utils.LocalStorage;
 
+import org.json.JSONObject;
+
 public class Core {
-    public static final String USER = "user";
-    public static final String LEADER = "leader";
+
 
     private static Core mSharedInstance;
-    private String mCurrentUserPosition;
+    private String mCurrentUserPosition = "";
+    protected JSONObject mCurentMemberObject;
+
+    public JSONObject getCurentMemberObject() {
+        return mCurentMemberObject;
+    }
+
+    public void setCurentMemberObject(JSONObject mCurentMemberObject) {
+        this.mCurentMemberObject = mCurentMemberObject;
+    }
 
     public static Core getInstance() {
         if (mSharedInstance == null) {
@@ -24,5 +34,13 @@ public class Core {
 
     public String getmCurrentUserPosition() {
         return mCurrentUserPosition;
+    }
+
+    public boolean isLeader() {
+        return mCurrentUserPosition.equalsIgnoreCase(MemberModule.LEADER);
+    }
+
+    public boolean isHelpingLeader() {
+        return mCurrentUserPosition.equalsIgnoreCase(MemberModule.HELPING_LEADER);
     }
 }

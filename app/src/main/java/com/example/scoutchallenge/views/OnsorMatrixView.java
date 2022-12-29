@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.HeadComponents;
@@ -96,7 +97,7 @@ public class OnsorMatrixView extends HeadView {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMarginEnd(margin);
         params.setMarginStart(margin);
-        params.topMargin = getHeadSize();
+        params.topMargin = getHeadSize() + margin;
         mSearch.setLayoutParams(params);
 
         mSearch.measure(0, 0);
@@ -105,13 +106,15 @@ public class OnsorMatrixView extends HeadView {
 
         params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.setMarginEnd(dpToPx(16));
-        params.topMargin = getHeadSize() + searchHeight + margin;
+        params.topMargin = getHeadSize() + searchHeight + margin * 2;
+        params.bottomMargin = dpToPx(20);
         mMatrixList.setLayoutParams(params);
 
         params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.setMarginEnd(margin);
         params.setMarginStart(margin);
         params.topMargin = getHeadSize() + searchHeight + margin;
+        params.bottomMargin = getBottomNavHeight();
         mUserList.setLayoutParams(params);
 
     }
@@ -191,6 +194,10 @@ public class OnsorMatrixView extends HeadView {
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
+        if (!Core.getInstance().isLeader()) {
+            showSimplePopup(getString(R.string.you_dont_have_a_permission));
+            return;
+        }
         pushView(R.id.onsorView);
     }
 }

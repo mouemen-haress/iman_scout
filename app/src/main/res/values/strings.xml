@@ -39,11 +39,20 @@
 
     <string name="did_you_have_clothe">هل يملك لباس كشفي ؟ </string>
     <string name="user_added_success">تم اضافة العنصر بنجاح</string>
+    <string name="user_updated_success">تم تعديل العنصر بنجاح</string>
+
     <string name="add_new_activity">أضف نشاط جديد</string>
     <string name="user_was_checked">أ</string>
+    <string name="update_user">تعديل المستخدم</string>
+
 
     // error Msg
     <string name="email_exist">هذا البريد موجود سابقا </string>
     <string name="server_error">يوجد خطا متعلق بالسرفر</string>
+    <string name="all_user_add">كل العناصر مضافة الى هذا النشاط</string>
+    <string name="can_not_delete_this_taliaa">لا يمكنك حذف  هذه الطليعة</string>
+    <string name="you_can_not_update_profile">حتى الان لا يمكنك تعديل الصورة</string>
+    <string name="you_dont_have_a_permission">ليس لديك الصلاحية</string>
+
 
 </resources>

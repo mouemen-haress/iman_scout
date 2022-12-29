@@ -24,6 +24,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCaller;
 import androidx.core.widget.NestedScrollView;
 
+import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.CategoriesComponent;
@@ -35,10 +36,12 @@ import com.example.scoutchallenge.conponents.MDrawableEditText;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.helpers.PasswordHelper;
+import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.CategoriesMenuDelegate;
 import com.example.scoutchallenge.interfaces.DidOnTap;
-import com.example.scoutchallenge.modules.UserModule;
+import com.example.scoutchallenge.models.TaliaaModel;
+import com.example.scoutchallenge.models.UserModule;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
 import org.json.JSONArray;
@@ -62,10 +65,8 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
     public static final String SELF_INFOS = "معلومات شخصية";
     public static final String SOCIAL_INFOS = "معلومات اجتماعية";
 
-    public static final String OTHER = "أخرى";
 
-
-    private static final String[] MENU_IDS = {SELF_INFOS, FATHER_INFOS, MOTHER_INFOS, SOCIAL_INFOS, OTHER};
+    private static final String[] MENU_IDS = {SELF_INFOS, FATHER_INFOS, MOTHER_INFOS, SOCIAL_INFOS, TaliaaModel.OTHER};
     Map<String, LinearLayout> mContainerMap;
     UserModule mUserModule = new UserModule();
 
@@ -83,6 +84,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
     protected Switch mClothesSwitch;
     protected Spinner mTaliaaSpinner;
     protected MDrawableEditText mNumber;
+    protected MDrawableEditText mPassword;
 
 
     protected LinearLayout mFatherContainer;
@@ -120,8 +122,9 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
     protected UserModule mModule;
     protected String mCurrentSelectedSection;
-    private Uri mImageUri = null;
-    public int mSelectedTaliaaPosition = 0;
+    protected int mCurrentSelectedPosition = 0;
+    protected Uri mImageUri = null;
+    protected int mSelectedTaliaaPosition = 0;
 
 
     @Override
@@ -171,28 +174,10 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         mEmail.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus) {
-                    BackendProxy.getInstance().mUserManager.checkUserEmail(mEmail.getText().trim(), new CallBack() {
-                        @Override
-                        public void onResult(String response) {
-                            if (response != null) {
-                                mEmail.removeCondition(MDrawableEditText.DEFAULT);
-                            } else {
-
-                            }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mEmail.canGo();
-
-                                }
-                            });
-                        }
-                    });
-                } else {
-                }
+                checkEmail(hasFocus);
             }
         });
+
         mSelfContainer.addView(mEmail);
 
         mDate = new DatePickerComponent(ctx);
@@ -245,6 +230,13 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         mNumber.addCondition(MDrawableEditText.REQUIRE);
         mNumber.setHintText(getString(R.string.number));
         mSelfContainer.addView(mNumber);
+
+        mPassword = new MDrawableEditText(ctx);
+        mPassword.setPlaceHolder(getString(R.string.enter_password));
+        mPassword.setHintText(getString(R.string.enter_password));
+        mPassword.addCondition(MDrawableEditText.REQUIRE);
+        mPassword.hide();
+        mSelfContainer.addView(mPassword);
 
 
         //  Father's Infos
@@ -356,7 +348,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
         //  Other Infos
         mOtherContainer = new LinearLayout(ctx);
-        mContainerMap.put(OTHER, mOtherContainer);
+        mContainerMap.put(TaliaaModel.OTHER, mOtherContainer);
         mOtherContainer.setVisibility(View.GONE);
         mOtherContainer.setOrientation(LinearLayout.VERTICAL);
         mMainContainer.addView(mOtherContainer);
@@ -394,17 +386,40 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         layoutViews();
     }
 
+    public void checkEmail(boolean hasFocus) {
+        if (!hasFocus) {
+            BackendProxy.getInstance().mUserManager.checkUserEmail(mEmail.getText().trim(), new CallBack() {
+                @Override
+                public void onResult(String response) {
+                    if (response != null) {
+                        mEmail.removeCondition(MDrawableEditText.DEFAULT);
+                    } else {
+                        mEmail.addCondition(MDrawableEditText.DEFAULT);
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mEmail.canGo();
+
+                        }
+                    });
+                }
+            });
+        } else {
+        }
+    }
+
     private void fillTaliaaList() {
         JSONArray taliaaList = BackendProxy.getInstance().mTaliaaManager.mTaliaaList;
         if (taliaaList != null) {
-            String[] taliaasName = new String[taliaaList.length()];
+            String[] taliaasNames = new String[taliaaList.length()];
             for (int i = 0; i < taliaaList.length(); i++) {
                 JSONObject currentObjet = taliaaList.optJSONObject(i);
                 if (currentObjet != null) {
-                    taliaasName[i] = currentObjet.optString("name");
+                    taliaasNames[i] = currentObjet.optString("name");
                 }
             }
-            ArrayAdapter aa = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, taliaasName);
+            ArrayAdapter aa = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, taliaasNames);
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             mTaliaaSpinner.setAdapter(aa);
         }
@@ -428,13 +443,46 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
     }
 
     private void addUser() {
+        fillUserModel();
+        showLockedLoading();
+
+        BackendProxy.getInstance().mUserManager.addUser(mUserModule, new CallBack() {
+            @Override
+            public void onResult(String response) {
+                runOnUiThread(() -> {
+                    if (response != null) {
+                        showSimplePopup(getString(R.string.user_added_success));
+                        BackendProxy.getInstance().mUserManager.getAllUser(new ArrayCallBack() {
+                            @Override
+                            public void onResult(JSONArray array) {
+                                if (array != null) {
+                                    runOnUiThread(() -> {
+                                        hideLockedLoading();
+                                        App.getSharedInstance().getMainActivity().injectTaliaaUSerDataLocaly(null);
+                                        popBackStack();
+
+                                    });
+                                }
+                            }
+                        });
+
+
+                    } else {
+                        showSimplePopup(getString(R.string.server_error));
+                    }
+                });
+            }
+        });
+    }
+
+    public void fillUserModel() {
         if (canPassOtherContainer() || D.IS_STIMILATE_ADD_USER_ENABLED) {
             mUserModule.setName(mName.getText().trim());
             mUserModule.setmEmail(mEmail.getText().trim());
             mUserModule.setmDateOfBirth(mDate.getText());
             mUserModule.setmRegisterNumber(mNumber.getText().trim());
             mUserModule.setmPersonalBloodType(mBloodType.getText().trim());
-            mUserModule.setmHasClothes(mClothesSwitch.hasSelection());
+            mUserModule.setmHasClothes(mClothesSwitch.isChecked());
             if (mSelectedTaliaaPosition != -1) {
                 JSONArray taliaaList = BackendProxy.getInstance().mTaliaaManager.mTaliaaList;
                 if (taliaaList != null) {
@@ -458,25 +506,13 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
             mUserModule.setmSchool(mCurrentEducation.getText().trim());
             mUserModule.setmIsHasChronicDisease(mIllness.getText().trim());
             mUserModule.setmIsHasOtherAssociation(mInsurance.getText().trim());
-            mUserModule.setmPassword(PasswordHelper.generateRandomdPassword(8));
-            showLockedLoading();
-
-            BackendProxy.getInstance().mUserManager.addUser(mUserModule, new CallBack() {
-                @Override
-                public void onResult(String response) {
-                    runOnUiThread(() -> {
-                        hideLockedLoading();
-
-                        if (response != null) {
-                            BackendProxy.getInstance().mUserManager.getAllUser(null);
-                            showSimplePopup(getString(R.string.user_added_success));
-                        } else {
-                            showSimplePopup(getString(R.string.server_error));
-                        }
-                    });
-                }
-            });
+            mUserModule.setmPassword(getPassword());
         }
+
+    }
+
+    public String getPassword() {
+        return PasswordHelper.generateRandomdPassword(8);
     }
 
 
@@ -513,6 +549,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         mTaliaaSpinner.setLayoutParams(linearParams);
         mTaliaaSpinner.setPadding(margin / 2, margin / 2, margin / 2, margin / 2);
         mNumber.setLayoutParams(linearParams);
+        mPassword.setLayoutParams(linearParams);
         mFatherName.setLayoutParams(linearParams);
 //        mFatherDate.setLayoutParams(linearParams);
         mFatherBloodType.setLayoutParams(linearParams);
@@ -574,16 +611,29 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
     @Override
     public void didPreventSelectCategoryCell(JSONObject data, View view, int position) {
-        boolean shouldReturn = false;
         if (D.IS_STIMILATE_ADD_USER_ENABLED) {
-            addUser();
+            mCategoriesMenu.selectionAction(view, position);
+            didSelectCategoryCell(data);
             return;
         }
+        boolean shouldReturn = false;
+        if (mCurrentSelectedPosition > position) {
+            mCategoriesMenu.selectionAction(view, position);
+            didSelectCategoryCell(data);
+            return;
+        }
+        mCurrentSelectedPosition = position;
         switch (mCurrentSelectedSection) {
             case SELF_INFOS:
-                if (!canPassSelfInfoContainer()) {
-                    shouldReturn = true;
-                }
+                canPassSelfInfoContainer(new CallBack() {
+                    @Override
+                    public void onResult(String response) {
+                        if (response != null) {
+                            mCategoriesMenu.selectionAction(view, position);
+                            didSelectCategoryCell(data);
+                        }
+                    }
+                });
                 break;
 
             case FATHER_INFOS:
@@ -606,7 +656,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
                 }
                 break;
 
-            case OTHER:
+            case TaliaaModel.OTHER:
                 if (!canPassOtherContainer()) {
                     shouldReturn = true;
                 }
@@ -614,7 +664,9 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
             default:
                 break;
         }
-        if (shouldReturn) {
+
+
+        if (shouldReturn || mCurrentSelectedSection.equalsIgnoreCase(SELF_INFOS)) {
             return;
         }
 
@@ -672,17 +724,41 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         }
     }
 
-    public boolean canPassSelfInfoContainer() {
+
+    public void canPassSelfInfoContainer(CallBack callBack) {
         Boolean nameGo = mName.canGo();
         Boolean dateGo = mDate.canGo();
         Boolean numberGo = mNumber.canGo();
-        Boolean emailGo = mEmail.canGo();
 
-        if (mImageUri == null) {
+        if (isImageEmpty()) {
             Toast.makeText(getActivity(), getString(R.string.image_require), Toast.LENGTH_LONG).show();
         }
 
-        return nameGo && dateGo && numberGo && emailGo && mImageUri != null;
+        BackendProxy.getInstance().mUserManager.checkUserEmail(mEmail.getText().trim(), new CallBack() {
+            @Override
+            public void onResult(String response) {
+                if (response != null) {
+                    mEmail.removeCondition(MDrawableEditText.DEFAULT);
+                } else {
+                    mEmail.addCondition(MDrawableEditText.DEFAULT);
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Boolean emailGo = mEmail.canGo();
+                        boolean canSelfPass = nameGo && dateGo && numberGo && emailGo && !isImageEmpty();
+                        if (callBack != null) {
+                            if (canSelfPass) {
+                                callBack.onResult("");
+                            } else {
+                                callBack.onResult(null);
+                            }
+                        }
+
+                    }
+                });
+            }
+        });
     }
 
     public boolean canPassFatherContainer() {
@@ -708,6 +784,10 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
         Boolean currentEducationGo = mCurrentEducation.canGo();
         return currentEducationGo;
+    }
+
+    public boolean isImageEmpty() {
+        return mImageUri == null;
     }
 
     @Override

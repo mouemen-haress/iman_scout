@@ -2,6 +2,7 @@ package com.example.scoutchallenge.conponents.components_Group;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.CircularImageView;
@@ -57,8 +59,9 @@ public class UserListComponent extends HeadComponents implements DidOnTap {
                 JSONObject clickedObj = new JSONObject();
                 clickedObj = mAdapter.mDataSource.optJSONObject(position);
                 if (clickedObj != null) {
-//                    App.getSharedInstance().getMainActivity().pushView(R.id.showUserInfoView);
-                    BackendProxy.getInstance().mUserManager.deleteUserFromTaliaa(clickedObj.optString("_id"), null);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("userObj", clickedObj.toString());
+                    pushView(R.id.showUserInfoView, bundle);
                 }
             }
 

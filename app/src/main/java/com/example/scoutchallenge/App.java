@@ -9,7 +9,7 @@ import org.json.JSONArray;
 
 public class App extends Application {
 
-    public Activity mMyActivity;
+    public MainActivity mMyActivity;
     private static App mSharedInstance;
 
     private App() {

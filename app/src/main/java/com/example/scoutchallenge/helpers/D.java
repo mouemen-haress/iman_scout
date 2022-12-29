@@ -9,9 +9,9 @@ import java.util.HashMap;
 public class D {
 
     // Api
-    public final static String URL = "http://api-kachaf.herokuapp.com/api";
-    //        public final static String URL = "http://192.168.1.159:8080/api";
-    public final static String ASSET_URL = "http://192.168.119.184:8080";
+//    public final static String URL = "http://api-kachaf.herokuapp.com/api";
+    public final static String URL = "http://192.168.1.109:8080/api";
+    public final static String ASSET_URL = "http://192.168.1.109:8080";
 
 
     public final static String SALAT_ROOT = "/get-prayer";
@@ -38,7 +38,8 @@ public class D {
     //flag
     public static final boolean IS_STIMILATE_ADD_USER_ENABLED = false;
 
-
+    //size
+    public static int TAB_BAR_HEIGHT = Tools.dpToPx(50);
     protected static HashMap<String, Integer> mResourceMap;
 
 
@@ -66,6 +67,8 @@ public class D {
         mResourceMap.put("unchecked_icon", new Integer(R.drawable.unchecked_icon));
         mResourceMap.put("plus_icon", new Integer(R.drawable.plus));
         mResourceMap.put("false_icon", new Integer(R.drawable.false_icon));
+        mResourceMap.put("settings", new Integer(R.drawable.settings));
+        mResourceMap.put("rope", new Integer(R.drawable.rope));
 
         if (mResourceMap.containsKey(resource)) {
             return mResourceMap.get(resource).intValue();

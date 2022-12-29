@@ -36,7 +36,9 @@ public class LoginManager {
                                 if (message.equalsIgnoreCase(SUCCESS_LOGIN)) {
                                     JSONObject data = resp.optJSONObject("data");
                                     if (data != null) {
-                                        Core.getInstance().setmCurrentUserPosition(data.optString("position"));
+                                        Core.getInstance().setmCurrentUserPosition(data.optString("Position"));
+                                        Core.getInstance().setCurentMemberObject(data);
+
                                         LocalStorage.setString(LocalStorage.SELF_ID, data.optString("id"));
                                         LocalStorage.setString(LocalStorage.SQUAD, data.optString("squad"));
                                         LocalStorage.setString(LocalStorage.FAWJ, data.optString("fawj"));

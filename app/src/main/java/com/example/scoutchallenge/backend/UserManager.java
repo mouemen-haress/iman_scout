@@ -1,16 +1,14 @@
 package com.example.scoutchallenge.backend;
 
-import android.net.Uri;
-
+import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.helpers.StringHelper;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
-import com.example.scoutchallenge.modules.UserModule;
+import com.example.scoutchallenge.models.UserModule;
 import com.example.scoutchallenge.network.ApiClient;
 import com.example.scoutchallenge.utils.LocalStorage;
-import com.google.android.gms.common.api.Api;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,7 +30,7 @@ public class UserManager {
     public void addUser(UserModule model, CallBack callBack) {
 
         JSONObject body = new JSONObject();
-        body = generateFakeUser(model.getmName(), true, model);
+        body = parseUserModel(model.getmName(), false, model);
 
         ApiClient.getInstance().perFormeMultiTypeRequest(model.getmImageUri(), D.ADD_USER, body, new CallBack() {
             @Override
@@ -49,45 +47,55 @@ public class UserManager {
         });
     }
 
+    public void addUserLocaly(UserModule userModel, CallBack callBack) {
+        JSONObject userObject = parseUserModel("", false, userModel);
+        if (userObject != null) {
+            mAllUserList.put(userObject);
+            mUserMap.put(userModel.getId(), userObject);
+        }
+        App.getSharedInstance().getMainActivity().injectTaliaaUSerDataLocaly(null);
+    }
 
 
-    private JSONObject generateFakeUser(String phone, boolean makeTrue, UserModule model) {
+    private JSONObject parseUserModel(String fakeText, boolean isFake, UserModule model) {
         JSONObject body = new JSONObject();
-        JsonHelper.put(body, "Name", phone);
-        makeTrue = !D.IS_STIMILATE_ADD_USER_ENABLED;
+        JsonHelper.put(body, "Name", fakeText);
+        isFake = D.IS_STIMILATE_ADD_USER_ENABLED;
         Random rand = new Random();
-
+        fakeText = "test";
         JsonHelper.put(body, "Email", rand.nextInt(50));
-        JsonHelper.put(body, "Date", phone);
-        JsonHelper.put(body, "BloodType", phone);
-        JsonHelper.put(body, "Number", phone);
-        JsonHelper.put(body, "Password", phone);
+        JsonHelper.put(body, "Name", rand.nextInt(50));
+
+        JsonHelper.put(body, "Date", fakeText);
+        JsonHelper.put(body, "BloodType", fakeText);
+        JsonHelper.put(body, "Number", fakeText);
+        JsonHelper.put(body, "Password", fakeText);
         JsonHelper.put(body, "Position", "onsor");
         JsonHelper.put(body, "isAdmin", "false");
-        JsonHelper.put(body, "FatherName", phone);
-        JsonHelper.put(body, "FatherBloodType", phone);
-        JsonHelper.put(body, "FatherNumber", phone);
-        JsonHelper.put(body, "FatherWork", phone);
-        JsonHelper.put(body, "MotherName", phone);
-        JsonHelper.put(body, "MotherDate", phone);
-        JsonHelper.put(body, "MotherBloodType", phone);
-        JsonHelper.put(body, "MotherNumber", phone);
-        JsonHelper.put(body, "MotherWork", phone);
-        JsonHelper.put(body, "PlaceOfBirth", phone);
-        JsonHelper.put(body, "Address", phone);
-        JsonHelper.put(body, "NbOfFamily", phone);
-        JsonHelper.put(body, "AddressType", phone);
-        JsonHelper.put(body, "CurrentEducation", phone);
-        JsonHelper.put(body, "Hobbies", phone);
-        JsonHelper.put(body, "Insurance", phone);
-        JsonHelper.put(body, "taliaa", phone);
+        JsonHelper.put(body, "FatherName", fakeText);
+        JsonHelper.put(body, "FatherBloodType", fakeText);
+        JsonHelper.put(body, "FatherNumber", fakeText);
+        JsonHelper.put(body, "FatherWork", fakeText);
+        JsonHelper.put(body, "MotherName", fakeText);
+        JsonHelper.put(body, "MotherDate", fakeText);
+        JsonHelper.put(body, "MotherBloodType", fakeText);
+        JsonHelper.put(body, "MotherNumber", fakeText);
+        JsonHelper.put(body, "MotherWork", fakeText);
+        JsonHelper.put(body, "PlaceOfBirth", fakeText);
+        JsonHelper.put(body, "Address", fakeText);
+        JsonHelper.put(body, "NbOfFamily", fakeText);
+        JsonHelper.put(body, "AddressType", fakeText);
+        JsonHelper.put(body, "CurrentEducation", fakeText);
+        JsonHelper.put(body, "Hobbies", fakeText);
+        JsonHelper.put(body, "Insurance", fakeText);
+        JsonHelper.put(body, "taliaa", fakeText);
         JsonHelper.put(body, "SerialNumber", model.getmSerialNumber());
-        JsonHelper.put(body, "Illness", phone);
+        JsonHelper.put(body, "Illness", fakeText);
         JsonHelper.put(body, "squad", LocalStorage.getString(LocalStorage.SQUAD));
-        JsonHelper.put(body, "moufawadiyeh", LocalStorage.MOUFAWADIYEH);
-        JsonHelper.put(body, "fawj", LocalStorage.FAWJ);
+        JsonHelper.put(body, "moufawadiyeh", LocalStorage.getString(LocalStorage.MOUFAWADIYEH));
+        JsonHelper.put(body, "fawj", LocalStorage.getString(LocalStorage.FAWJ));
 
-        if (makeTrue) {
+        if (!isFake) {
             body = new JSONObject();
             JsonHelper.put(body, "Name", model.getmName());
             JsonHelper.put(body, "Email", model.getmEmail());
@@ -132,17 +140,22 @@ public class UserManager {
         ApiClient.getInstance().perFormeRequest(D.GET_USER_SQUAD + "/" + LocalStorage.getString(LocalStorage.SQUAD), null, new CallBack() {
             @Override
             public void onResult(String response) {
-                if (callBack != null) {
-                    if (response != null) {
-                        JSONObject object = JsonHelper.parse(response);
-                        JSONArray userArray = object.optJSONArray("user");
-                        mAllUserList = userArray;
+                if (response != null) {
+                    JSONObject object = JsonHelper.parse(response);
+                    JSONArray userArray = object.optJSONArray("user");
+                    mAllUserList = userArray;
+                    createUserMap();
+
+                    if (callBack != null) {
                         callBack.onResult(mAllUserList);
-                        createUserMap();
-                    } else {
+                    }
+
+                } else {
+                    if (callBack != null) {
                         callBack.onResult(null);
                     }
                 }
+
             }
         });
     }
@@ -163,7 +176,7 @@ public class UserManager {
 
     public void checkUserEmail(String email, CallBack callBack) {
         JSONObject body = new JSONObject();
-        JsonHelper.put(body, "email", email);
+        JsonHelper.put(body, "Email", email);
         ApiClient.getInstance().perFormeRequest(D.CHECK_EMAIL, body, new CallBack() {
             @Override
             public void onResult(String response) {
@@ -178,10 +191,11 @@ public class UserManager {
     }
 
 
-    public void updateUser(UserModule model, String userId, CallBack callBack) {
+    public void updateUser(UserModule model, CallBack callBack) {
         JSONObject body = new JSONObject();
-        body = generateFakeUser("dsadsa", true, model);
-        ApiClient.getInstance().perFormeRequest(D.UPDATE_USER + "/" + "6361757a8a2292d2b3e7f142", body, new CallBack() {
+        body = parseUserModel(model.getmName(), false, model);
+
+        ApiClient.getInstance().perFormeRequest(D.UPDATE_USER + "/" + model.getId(), body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -249,6 +263,27 @@ public class UserManager {
         return mUserMap.get(id);
     }
 
+    public UserModule getUserBySerialNumber(String searchedSerial) {
+        if (StringHelper.isNullOrEmpty(searchedSerial)) {
+            return null;
+        }
+        if (mAllUserList != null) {
+            for (int i = 0; i < mAllUserList.length(); i++) {
+                JSONObject currentUser = mAllUserList.optJSONObject(i);
+                if (currentUser != null) {
+                    UserModule userModule = new UserModule();
+                    userModule.setData(currentUser);
+                    if (searchedSerial.equalsIgnoreCase(userModule.getmSerialNumber())) {
+                        return userModule;
+                    }
+                }
+            }
+        }
+        return null;
+
+    }
+
+
     public JSONArray getOtherUser(JSONArray cuurentUserList) {
         if (cuurentUserList == null || mUserMap == null) {
             return null;
@@ -262,6 +297,10 @@ public class UserManager {
             JSONObject user = cuurentUserList.optJSONObject(i);
             if (user != null) {
                 JSONObject userData = user.optJSONObject("userId");
+                if (userData == null) {
+                    userData = user;
+                }
+
                 if (userData != null) {
                     String userId = userData.optString("_id");
                     cuurentUSerListKeys.add(userId);

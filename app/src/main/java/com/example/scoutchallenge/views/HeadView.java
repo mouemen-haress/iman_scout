@@ -5,6 +5,7 @@ import static android.view.View.GONE;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -34,9 +36,15 @@ import com.example.scoutchallenge.conponents.MImageComponent;
 import com.example.scoutchallenge.helpers.AnimationHelper;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.Tools;
+import com.example.scoutchallenge.models.MemberModule;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.json.JSONObject;
+
 public class HeadView extends Fragment {
+    public static final int HEADER_LOG = 0;
+    public static final int ACTION_BTN = 1;
+    public static final int PROFILE_BTN = 1;
 
     public NavController mNavController;
     protected Context mSelf;
@@ -47,10 +55,15 @@ public class HeadView extends Fragment {
     protected ImageView mLoader;
     protected FrameLayout mRootView;
     protected BottomNavigationView mMainTabBar;
+
+
     protected FrameLayout mHeader;
     protected MImageComponent mLogo;
-    ActivityResultLauncher<Intent> mLauncher;
+    protected MImageComponent mActionBtn;
+    protected MImageComponent mProfile;
 
+
+    ActivityResultLauncher<Intent> mLauncher;
     protected boolean mIsLockedPopup = false;
     ActivityResultLauncher<String> mRequestPermissionLauncher;
 
@@ -81,22 +94,40 @@ public class HeadView extends Fragment {
         mRootView.setBackgroundResource(R.color.main_background);
 
         mHeader = new FrameLayout(getContext());
-        mHeader.setBackgroundResource(R.color.headColor);
         mHeader.setVisibility(GONE);
+        mHeader.setElevation(10);
+        mHeader.setBackgroundColor(getColor(R.color.headColor));
         mRootView.addView(mHeader);
 
-        mLogo = new MImageComponent(getContext());
-        mLogo.hide();
-        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.OVAL, R.color.white, dpToPx(250), -1, -1);
-        mLogo.setElevation(10);
-        int padding = dpToPx(23);
-        mLogo.setPadding(padding, padding, padding, padding);
-        mLogo.setBackground(gradientDrawable);
-        mRootView.addView(mLogo);
+        mActionBtn = new MImageComponent(getContext());
+        mActionBtn.hide();
+        mActionBtn.mIndex = ACTION_BTN;
+        mHeader.addView(mActionBtn);
+        mActionBtn.setOnTapListener(view1 -> {
+            onHeadBtnClicked(view1);
+        });
 
+        mProfile = new MImageComponent(getContext());
+        mProfile.mIndex = PROFILE_BTN;
+        mProfile.setImageResource(getImage("settings"));
+        mHeader.addView(mProfile);
+        mProfile.setOnTapListener(view1 -> {
+            onHeadBtnClicked(view1);
+        });
+        mLogo = new MImageComponent(getContext());
+        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.OVAL, -1, dpToPx(250), 2,getColor(R.color.secondColor));
+        mLogo.mIndex = HEADER_LOG;
+        mLogo.setImageResource(getImage("logo"));
+        mLogo.setBackground(gradientDrawable);
+        int padding = dpToPx(3);
+        mLogo.setPadding(padding,padding,padding,padding);
+        mLogo.getImage().setColorFilter(getColor(R.color.white));
+        mHeader.addView(mLogo);
         mLogo.setOnTapListener(view1 -> {
             onHeadBtnClicked(view1);
         });
+
+        mRootView.setBackgroundColor(getColor(R.color.secondColor));
 
         layoutViews();
         return mRootView;
@@ -162,17 +193,28 @@ public class HeadView extends Fragment {
     }
 
     private void layoutViews() {
-        int logoSize = dpToPx(100);
+        int logoSize = dpToPx(32);
         int headerSize = logoSize / 2 + dpToPx(16);
 
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, headerSize);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,Tools.getBottomNavHeight());
         mHeader.setLayoutParams(params);
 
         params = new FrameLayout.LayoutParams(logoSize, logoSize);
-        params.topMargin = headerSize - logoSize / 2;
-        params.gravity = Gravity.CENTER_HORIZONTAL;
+        params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+        params.setMarginEnd(logoSize / 2);
         mLogo.setLayoutParams(params);
+
+        params = new FrameLayout.LayoutParams(logoSize, logoSize);
+        params.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
+        params.setMarginStart((logoSize / 2) * 2 + logoSize);
+        mActionBtn.setLayoutParams(params);
+
+        params = new FrameLayout.LayoutParams(logoSize, logoSize);
+        params.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
+        params.setMarginStart(logoSize / 2);
+        mProfile.setLayoutParams(params);
+
     }
 
     public void runOnUiThread(Runnable r) {
@@ -234,9 +276,11 @@ public class HeadView extends Fragment {
 
     public void showSimplePopup(String des) {
         Tools.showSimplePopup(des);
-
     }
 
+    public void showToast(String text) {
+        Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
+    }
 
     public void showLockedLoading() {
         switchPopupState(true);
@@ -248,15 +292,17 @@ public class HeadView extends Fragment {
     }
 
     public void hideLockedLoading() {
-        switchPopupState(false);
-        mLoaderContainer.setVisibility(GONE);
-        mPopupContainer.setVisibility(GONE);
-        mPopupView.setVisibility(GONE);
+        runOnUiThread(() -> {
 
-        Animation currentAnimation = mLoader.getAnimation();
-        if (currentAnimation != null) {
-            currentAnimation.cancel();
-        }
+            switchPopupState(false);
+            mLoaderContainer.setVisibility(GONE);
+            mPopupContainer.setVisibility(GONE);
+            mPopupView.setVisibility(GONE);
+            Animation currentAnimation = mLoader.getAnimation();
+            if (currentAnimation != null) {
+                currentAnimation.cancel();
+            }
+        });
 
 
     }
@@ -293,7 +339,7 @@ public class HeadView extends Fragment {
     }
 
     public void pushView(int target, Bundle bundle) {
-        mNavController.navigate(target, bundle);
+        Tools.pushView(target, bundle);
     }
 
     public void pushAndSetRootView(int lastFragment, int target) {
@@ -334,23 +380,20 @@ public class HeadView extends Fragment {
 
     public void showHeader() {
         mHeader.setVisibility(View.VISIBLE);
-        mLogo.show();
+        mActionBtn.show();
     }
 
     public void hideHeader() {
         mHeader.setVisibility(GONE);
-        mLogo.hide();
+        mActionBtn.hide();
     }
 
     public void setHeadBtn(int rsc) {
-        mLogo.setImageResource(rsc);
+        mActionBtn.setImageResource(rsc);
     }
 
     public int getHeadSize() {
-        int logoSize = dpToPx(100);
-        int headerSize = logoSize / 2 + dpToPx(16);
-        return headerSize + logoSize / 2;
-
+       return getBottomNavHeight();
     }
 
     public void requestPermission(String permission) {
@@ -377,5 +420,20 @@ public class HeadView extends Fragment {
 
     public View generateLine() {
         return Tools.generateLine();
+    }
+
+    public void onNotification(String notificationType, JSONObject data) {
+
+    }
+
+    public void setMenu(String position) {
+        runOnUiThread(() -> {
+
+            BottomNavigationView menu = getActivity().findViewById(R.id.tab_Bar);
+            if (position.equalsIgnoreCase(MemberModule.HELPING_LEADER)) {
+                menu.getMenu().clear(); //clear old inflated items.
+                menu.inflateMenu(R.menu.helping_leader_bottom_menu);
+            }
+        });
     }
 }

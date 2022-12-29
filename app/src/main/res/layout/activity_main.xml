@@ -57,13 +57,19 @@
 
         app:navGraph="@navigation/navigation" />
 
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:layout_width="match_parent"
         android:id="@+id/tab_Bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/main_bottom_menu"
         android:layout_gravity="bottom"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/white"
         android:visibility="gone"
-        android:background="@color/white" />
+        app:menu="@menu/leader_bottom_menu" />
+
+
 
 </FrameLayout>

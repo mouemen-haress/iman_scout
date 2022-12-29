@@ -13,6 +13,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
@@ -24,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import androidx.core.content.res.ResourcesCompat;
+import androidx.navigation.NavController;
 
 import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.R;
@@ -108,7 +110,6 @@ public class Tools {
         }
 
         if (color != -1) {
-
             gradientDrawable.setColor(getColor(color));
         }
 
@@ -228,6 +229,14 @@ public class Tools {
             mDialog.setContentView(simplePopup);
             mDialog.show();
         });
+
+    }
+
+    public static void pushView(int target, Bundle bundle) {
+        NavController navController = App.getSharedInstance().mMyActivity.getNavController();
+        if (navController != null) {
+            navController.navigate(target, bundle);
+        }
 
     }
 }

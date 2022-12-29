@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -23,7 +24,7 @@ import org.json.JSONObject;
 
 public class HeadComponents extends FrameLayout {
 
-    int mIndex;
+    public int mIndex;
     private DidOnTap mListener;
     private Rect mRect;
     TypedArray mTypedArray;
@@ -180,4 +181,9 @@ public class HeadComponents extends FrameLayout {
     public void runOnUiThread(Runnable r) {
         Tools.runOnUIThread(r);
     }
+
+    public void pushView(int target, Bundle bundle) {
+        Tools.pushView(target, bundle);
+    }
+
 }
