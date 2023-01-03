@@ -55,6 +55,7 @@ public class UserInfoView extends AddUserView {
                             runOnUiThread(() -> {
                                 hideLockedLoading();
                                 showToast(getString(R.string.user_updated_success));
+                                popBackStack();
                             });
                         }
                     });

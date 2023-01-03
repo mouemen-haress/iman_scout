@@ -115,19 +115,18 @@ public class HeadView extends Fragment {
             onHeadBtnClicked(view1);
         });
         mLogo = new MImageComponent(getContext());
-        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.OVAL, -1, dpToPx(250), 2,getColor(R.color.secondColor));
+        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.OVAL, -1, dpToPx(250), 2, getColor(R.color.secondColor));
         mLogo.mIndex = HEADER_LOG;
         mLogo.setImageResource(getImage("logo"));
         mLogo.setBackground(gradientDrawable);
         int padding = dpToPx(3);
-        mLogo.setPadding(padding,padding,padding,padding);
+        mLogo.setPadding(padding, padding, padding, padding);
         mLogo.getImage().setColorFilter(getColor(R.color.white));
         mHeader.addView(mLogo);
         mLogo.setOnTapListener(view1 -> {
             onHeadBtnClicked(view1);
         });
 
-        mRootView.setBackgroundColor(getColor(R.color.secondColor));
 
         layoutViews();
         return mRootView;
@@ -197,7 +196,7 @@ public class HeadView extends Fragment {
         int headerSize = logoSize / 2 + dpToPx(16);
 
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,Tools.getBottomNavHeight());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Tools.getBottomNavHeight());
         mHeader.setLayoutParams(params);
 
         params = new FrameLayout.LayoutParams(logoSize, logoSize);
@@ -279,7 +278,9 @@ public class HeadView extends Fragment {
     }
 
     public void showToast(String text) {
-        Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
+        runOnUiThread(() -> {
+            Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
+        });
     }
 
     public void showLockedLoading() {
@@ -393,7 +394,7 @@ public class HeadView extends Fragment {
     }
 
     public int getHeadSize() {
-       return getBottomNavHeight();
+        return getBottomNavHeight();
     }
 
     public void requestPermission(String permission) {
@@ -428,11 +429,17 @@ public class HeadView extends Fragment {
 
     public void setMenu(String position) {
         runOnUiThread(() -> {
-
             BottomNavigationView menu = getActivity().findViewById(R.id.tab_Bar);
+            menu.getMenu().clear();
+
             if (position.equalsIgnoreCase(MemberModule.HELPING_LEADER)) {
-                menu.getMenu().clear(); //clear old inflated items.
                 menu.inflateMenu(R.menu.helping_leader_bottom_menu);
+            } else if (position.equalsIgnoreCase(MemberModule.MOUFAWAD)) {
+                menu.inflateMenu(R.menu.moufwad_menu);
+
+            } else {
+                menu.inflateMenu(R.menu.leader_bottom_menu);
+
             }
         });
     }

@@ -88,13 +88,7 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
         int headerSize = logoSize / 2 + dpToPx(16);
 
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(logoSize, logoSize);
-        params.topMargin = headerSize - logoSize / 2;
-        params.gravity = Gravity.CENTER_HORIZONTAL;
-        mActionBtn.setLayoutParams(params);
-
-
-        params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.topMargin = headerSize + logoSize / 2;
         params.bottomMargin = dpToPx(getBottomNavHeight());
         mTaliaaList.setLayoutParams(params);

@@ -65,9 +65,6 @@ public class HomeView extends HeadView {
 
         mAdapter = new ListAdapter();
 
-        if (Core.getInstance().isHelpingLeader()) {
-            setMenu(MemberModule.HELPING_LEADER);
-        }
 
         mMyManager = new GridLayoutManager(getContext(), RecyclerView.VERTICAL);
         mMyManager.setSpanCount(2);

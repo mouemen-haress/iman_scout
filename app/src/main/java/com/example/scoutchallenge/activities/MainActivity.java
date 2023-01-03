@@ -1,5 +1,6 @@
 package com.example.scoutchallenge.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -13,6 +14,7 @@ import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.helpers.JsonHelper;
+import com.example.scoutchallenge.helpers.PermissionsManager;
 import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
@@ -159,5 +161,11 @@ public class MainActivity extends AppCompatActivity {
             return mNavController;
         }
         return null;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionsManager.getInstance().handlePermissionResult(requestCode, permissions, grantResults);
     }
 }

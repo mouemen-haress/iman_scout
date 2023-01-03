@@ -51,7 +51,21 @@ public class BootView extends HeadView {
             case MemberModule.HELPING_LEADER:
                 fetchHelpingLeaderData();
                 break;
+
+            case MemberModule.MOUFAWAD:
+                pushView(R.id.moufawadHomeView);
+                break;
+
+            default:
+                Tools.showSimplePopup(getString(R.string.server_error));
+                pushAndSetRootView(R.id.bootView, R.id.loginView);
+                break;
+
         }
+
+        setMenu(position);
+
+
     }
 
     private void fetchHelpingLeaderData() {

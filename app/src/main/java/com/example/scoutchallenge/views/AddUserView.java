@@ -36,10 +36,12 @@ import com.example.scoutchallenge.conponents.MDrawableEditText;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.helpers.PasswordHelper;
+import com.example.scoutchallenge.helpers.PermissionsManager;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.CategoriesMenuDelegate;
 import com.example.scoutchallenge.interfaces.DidOnTap;
+import com.example.scoutchallenge.interfaces.DidPermissionGrainted;
 import com.example.scoutchallenge.models.TaliaaModel;
 import com.example.scoutchallenge.models.UserModule;
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -130,6 +132,15 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
     @Override
     public void init(Context ctx, View view) {
         super.init(ctx, view);
+
+        PermissionsManager.getInstance().requestStoragePermesssion(new DidPermissionGrainted() {
+            @Override
+            public void onPermissionResult(boolean trueOrFalse) {
+                if(false){
+                    popBackStack();
+                }
+            }
+        });
         mContainerMap = new HashMap<>();
 
         mCategoriesMenu = new CategoriesComponent(ctx);

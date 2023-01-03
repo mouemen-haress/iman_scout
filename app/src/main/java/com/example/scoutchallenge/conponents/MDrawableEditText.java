@@ -143,7 +143,7 @@ public class MDrawableEditText extends HeadComponents {
 
     }
 
-    private void layoutViews() {
+    public void layoutViews() {
         int margin = dpToPx(16);
         int hintHeight = dpToPx(25);
         int onDp = dpToPx(3);
@@ -303,6 +303,15 @@ public class MDrawableEditText extends HeadComponents {
 
     public void setText(String text) {
         mEditText.getEditText().setText(text);
+    }
+
+    public void transformToTextArea(int lines) {
+        LayoutParams params = (LayoutParams) mEditText.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        mEditText.setLayoutParams(params);
+
+        mEditText.getEditText().setLines(lines);
+
     }
 
 }

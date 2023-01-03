@@ -12,7 +12,9 @@ import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
+import com.example.scoutchallenge.helpers.PermissionsManager;
 import com.example.scoutchallenge.helpers.StringHelper;
+import com.example.scoutchallenge.interfaces.DidPermissionGrainted;
 import com.example.scoutchallenge.models.UserModule;
 import com.google.zxing.Result;
 
@@ -23,6 +25,14 @@ public class ScanView extends HeadView {
     public void init(Context ctx, View view) {
         super.init(ctx, view);
 
+        PermissionsManager.getInstance().requestCameraDelegate(new DidPermissionGrainted() {
+            @Override
+            public void onPermissionResult(boolean trueOrFalse) {
+                if(false){
+                    popBackStack();
+                }
+            }
+        });
         CodeScannerView scannerView = new CodeScannerView(ctx);
         mRootView.addView(scannerView);
         mCodeScanner = new CodeScanner(getContext(), scannerView);

@@ -74,4 +74,8 @@
         android:id="@+id/taliaaUserListView"
         android:name="com.example.scoutchallenge.views.TaliaaUserListView"
         android:label="TaliaaUserListView" />
+    <fragment
+        android:id="@+id/moufawadHomeView"
+        android:name="com.example.scoutchallenge.views.MoufawadHomeView"
+        android:label="MoufawadHomeView" />
 </navigation>

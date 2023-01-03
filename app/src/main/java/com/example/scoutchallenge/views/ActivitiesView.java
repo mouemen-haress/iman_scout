@@ -83,6 +83,10 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
                 if (currentObj != null) {
                     Bundle bundle = new Bundle();
                     bundle.putString("activityObj", currentObj.toString());
+                    if (mRelatedCategoryObj != null) {
+                        bundle.putString("categoryObj", mRelatedCategoryObj.toString());
+                    }
+
                     pushView(R.id.ActivityuserListView, bundle);
 
                 }
@@ -94,7 +98,6 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
             }
         }));
         mRootView.addView(mAvtivitiesList);
-
 
 
         fillActivities();
@@ -121,6 +124,7 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
                         if (response != null) {
                             JSONObject respObject = JsonHelper.parse(response);
                             JSONArray result = respObject.optJSONArray("activities");
+
                             mAdapter.mDataSource = result;
                             runOnUiThread(() -> {
                                 mAdapter.notifyDataSetChanged();
@@ -387,11 +391,11 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
-        AddPopup addTaliaaPopup = new AddPopup(getContext());
-        addTaliaaPopup.mNameEditText.setPlaceHolder(getString(R.string.add_new_activity));
-        addTaliaaPopup.mDelegate = this;
-        addTaliaaPopup.setOnTapListener(this);
+        AddPopup addActivityPopup = new AddPopup(getContext());
+        addActivityPopup.mNameEditText.setPlaceHolder(getString(R.string.add_new_activity));
+        addActivityPopup.mDelegate = this;
+        addActivityPopup.setOnTapListener(this);
 
-        showPopup(addTaliaaPopup);
+        showPopup(addActivityPopup);
     }
 }

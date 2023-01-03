@@ -157,7 +157,12 @@ public class Tools {
     }
 
     public static void hidePopup() {
-        mDialog.hide();
+        runOnUIThread(() -> {
+            if (mDialog != null) {
+                mDialog.hide();
+            }
+        });
+
     }
 
     public static void showPopup(HeadComponents view) {

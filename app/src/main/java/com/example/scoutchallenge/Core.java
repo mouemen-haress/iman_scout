@@ -43,4 +43,8 @@ public class Core {
     public boolean isHelpingLeader() {
         return mCurrentUserPosition.equalsIgnoreCase(MemberModule.HELPING_LEADER);
     }
+
+    public boolean isMoufawad() {
+        return mCurrentUserPosition.equalsIgnoreCase(MemberModule.MOUFAWAD);
+    }
 }

@@ -11,9 +11,13 @@ import androidx.annotation.NonNull;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.conponents.CircularImageView;
 import com.example.scoutchallenge.conponents.HeadComponents;
+import com.example.scoutchallenge.conponents.MImageComponent;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
+import com.example.scoutchallenge.interfaces.CallBack;
+import com.example.scoutchallenge.interfaces.DidOnTap;
+import com.example.scoutchallenge.interfaces.OnObjectCallBack;
 import com.example.scoutchallenge.models.UserModule;
 import com.example.scoutchallenge.network.MImageLoader;
 
@@ -25,8 +29,10 @@ public class UserCell extends HeadComponents {
     protected CircularImageView mImage;
     protected MTextView mNameLabel;
     protected MTextView mUserInfo;
+    protected MImageComponent mIcon;
     protected HeadComponents mLine;
-
+    public OnObjectCallBack mDelegate;
+    public boolean isKoraanCell = false;
 
     public UserCell(@NonNull Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,6 +63,21 @@ public class UserCell extends HeadComponents {
         mUserInfo.getLabel().setGravity(Gravity.CENTER);
         mUserInfo.setTextColor(getColor(R.color.hint));
         addView(mUserInfo);
+
+        mIcon = new MImageComponent(ctx);
+        mIcon.setImageResource(getImage("green_koran"));
+        mIcon.setOnTapListener(new DidOnTap() {
+            @Override
+            public void onTap(HeadComponents view) {
+                if (mDelegate != null) {
+                    if (mData != null) {
+                        mDelegate.OnObject(mData);
+                    }
+                }
+            }
+        });
+        mIcon.hide();
+        addView(mIcon);
 
         mLine = new HeadComponents(ctx);
         mLine.setBackgroundColor(getColor(R.color.headColor));
@@ -98,6 +119,11 @@ public class UserCell extends HeadComponents {
         params.bottomMargin = margin;
         mUserInfo.setLayoutParams(params);
 
+        params = new LayoutParams(iconSize / 2, iconSize / 2);
+        params.gravity = Gravity.CENTER_VERTICAL;
+        params.setMarginEnd(margin / 2);
+        mIcon.setLayoutParams(params);
+
 
         params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(2));
         params.gravity = Gravity.BOTTOM;
@@ -117,16 +143,19 @@ public class UserCell extends HeadComponents {
             JSONObject user = JsonHelper.getJSONObject(data, "userId");
             if (user == null) {
                 user = data;
-                userModule.setData(user);
-
             }
 
             if (user != null) {
+                userModule.setData(user);
                 mNameLabel.setText(userModule.getmName());
                 MImageLoader.loadWithGlide(userModule.getImageUrl(), 0, mImage.getImage());
                 mUserInfo.setText(userModule.getTaliaaName() + "." + userModule.getmDateOfBirth() + "." + userModule.getmAddress());
             }
+            if (isKoraanCell) {
+                mIcon.show();
+            }
         }
-
     }
+
 }
+

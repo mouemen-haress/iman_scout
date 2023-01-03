@@ -111,6 +111,11 @@ public class LoginView extends HeadView {
 
 //            email = "helping32@live.com";
 //            password = "helping32";
+
+            //moufawad
+//            email = "mfd32@live.com";
+//            password = "mfd32";
+
             BackendProxy.getInstance().mLoginManager.authenticate(email, password, new CallBack() {
                 @Override
                 public void onResult(String response) {

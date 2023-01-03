@@ -44,6 +44,11 @@
     <string name="add_new_activity">أضف نشاط جديد</string>
     <string name="user_was_checked">أ</string>
     <string name="update_user">تعديل المستخدم</string>
+    <string name="current_reading">ما تم تسميعه اليوم</string>
+    <string name="rating"> التقييم </string>
+    <string name="next_reading">المطلوب للمرة القادمة </string>
+    <string name="update">تعديل </string>
+
 
 
     // error Msg
@@ -53,6 +58,8 @@
     <string name="can_not_delete_this_taliaa">لا يمكنك حذف  هذه الطليعة</string>
     <string name="you_can_not_update_profile">حتى الان لا يمكنك تعديل الصورة</string>
     <string name="you_dont_have_a_permission">ليس لديك الصلاحية</string>
+    <string name="you_should_admit_the_camera_permission">يجب عليك فتج الاعدادت و اعطاء اذن لكاميرا</string>
+    <string name="you_should_admit_the_storage">يجب عليك فتج الاعدادت و اعطاء اذن للوصول للملفات</string>
 
 
 </resources>

@@ -102,9 +102,9 @@ public class ActivityManager {
 
         JSONObject body = new JSONObject();
         JsonHelper.put(body, "userId", userId);
-        JsonHelper.put(body, "note", "userId");
-        JsonHelper.put(body, "rate", "dsad");
-        JsonHelper.put(body, "next", "userId");
+        JsonHelper.put(body, "note", "");
+        JsonHelper.put(body, "rate", "");
+        JsonHelper.put(body, "next", "");
 
 
         ApiClient.getInstance().perFormeRequest(D.ADD_USER_TO_ACTIVITY + "/" + activityId, body, new CallBack() {
@@ -150,5 +150,26 @@ public class ActivityManager {
         });
     }
 
+    public void updateNoteActivities(String userId, String activityId, String note, String rate, String next,
+                                     CallBack callBack) {
+
+        JSONObject body = new JSONObject();
+        JsonHelper.put(body, "userId", userId);
+        JsonHelper.put(body, "note", note);
+        JsonHelper.put(body, "rate", rate);
+        JsonHelper.put(body, "next", next);
+
+        ApiClient.getInstance().perFormeRequest(D.UPDATE_NOTE_ACTIVITIES + "/" + activityId, body, new CallBack() {
+            @Override
+            public void onResult(String response) {
+                if (response != null) {
+                    callBack.onResult(response);
+                } else {
+                    callBack.onResult(null);
+                }
+
+            }
+        });
+    }
 
 }

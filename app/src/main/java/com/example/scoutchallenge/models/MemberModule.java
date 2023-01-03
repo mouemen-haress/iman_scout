@@ -10,6 +10,7 @@ public class MemberModule {
     public static final String USER = "user";
     public static final String LEADER = "leader";
     public static final String HELPING_LEADER = "helping leader";
+    public static final String MOUFAWAD = "moufawad";
 
 
     protected String mSerialNumber;

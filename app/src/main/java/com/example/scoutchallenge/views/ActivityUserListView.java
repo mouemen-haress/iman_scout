@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scoutchallenge.R;
+import com.example.scoutchallenge.backend.ActivityManager;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.HeadComponents;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.conponents.MyRecyclerView;
+import com.example.scoutchallenge.conponents.popups.KoranNotePopup;
 import com.example.scoutchallenge.conponents.popups.SelectUserPopup;
 import com.example.scoutchallenge.helpers.DateHelper;
 import com.example.scoutchallenge.helpers.JsonHelper;
@@ -29,6 +31,9 @@ import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.DidOnFinishWork;
 import com.example.scoutchallenge.interfaces.DidOnTap;
 import com.example.scoutchallenge.interfaces.OnCellSwipe;
+import com.example.scoutchallenge.interfaces.OnObjectCallBack;
+import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.network.ApiClient;
 import com.example.scoutchallenge.views.cells.UserCell;
 
 import org.json.JSONArray;
@@ -40,8 +45,10 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
     protected ActivityUserListView.ListAdapter mAdapter;
     protected LinearLayoutManager mMyManager;
     protected JSONObject mRelatedObj;
+    protected JSONObject mRelatedCategory;
     protected JSONArray mCurrentUserList;
     protected JSONArray mOtherUserList;
+    public OnObjectCallBack mDelegate;
 
     public ActivityUserListView() {
         // Required empty public constructor
@@ -99,8 +106,67 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
         }));
         mRootView.addView(mUserList);
 
+        mDelegate = new OnObjectCallBack() {
+            @Override
+            public void OnObject(JSONObject object) {
+                if (object != null) {
+                    JSONObject userData = object;
+                    UserModule userModule = new UserModule();
+                    if (userData.optJSONObject("userId") != null) {
+                        userModule.setData(userData.optJSONObject("userId"));
+                    }
+                    if (userData != null) {
+                        KoranNotePopup koranNotePopup = new KoranNotePopup(getContext());
+                        koranNotePopup.setData(userData);
+                        koranNotePopup.mDelegate = new CallBack() {
+                            @Override
+                            public void onResult(String response) {
+                                if (response != null) {
+                                    JSONObject data = JsonHelper.parse(response);
+                                    if (data != null) {
+                                        String current = data.optString("note");
+                                        String rate = data.optString("rate");
+                                        String next = data.optString("next");
+                                        showLockedLoading();
+                                        BackendProxy.getInstance().mActivityManager.updateNoteActivities(userModule.getId(), mRelatedObj.optString("_id"), current, rate, next, new CallBack() {
+                                            @Override
+                                            public void onResult(String response) {
+                                                hideLockedLoading();
+                                                hidePopup();
+                                                if (response != null) {
+                                                    runOnUiThread(() -> {
+                                                        showToast(getString(R.string.user_updated_success));
+                                                        updateUserLocaly(userData, current, rate, next);
+                                                    });
+
+                                                } else {
+                                                    showSimplePopup(getString(R.string.server_error));
+
+                                                }
+                                            }
+                                        });
+                                        return;
+                                    }
+                                }
+                                showSimplePopup(getString(R.string.server_error));
+                            }
+                        };
+                        showPopup(koranNotePopup);
+                    }
+                }
+            }
+        };
+
         fillUsers();
         layoutViews();
+    }
+
+    private void updateUserLocaly(JSONObject userData, String current, String rate, String next) {
+        JsonHelper.put(userData, "note", current);
+        JsonHelper.put(userData, "rate", rate);
+        JsonHelper.put(userData, "next", next);
+        mAdapter.notifyDataSetChanged();
+
     }
 
     protected void fillUsers() {
@@ -161,8 +227,18 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
             if (obj != null) {
                 mRelatedObj = obj;
             }
+
+            fillRelatedGeneralCategory(bundle);
         }
 
+    }
+
+    private void fillRelatedGeneralCategory(Bundle bundle) {
+        String dataString = bundle.getString("categoryObj");
+        JSONObject obj = JsonHelper.parse(dataString);
+        if (obj != null) {
+            mRelatedCategory = obj;
+        }
     }
 
     @Override
@@ -261,6 +337,9 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
         }
     }
 
+    public void handleIconCellClick(JSONObject data) {
+
+    }
 
     public class ListAdapter extends RecyclerView.Adapter<ActivityUserListView.ListAdapter.CellViewHolder> {
 //
@@ -312,7 +391,13 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
         public void onBindViewHolder(@NonNull ActivityUserListView.ListAdapter.CellViewHolder holder, int position) {
             if (mDataSource != null) {
                 JSONObject object = mDataSource.optJSONObject(position);
+                if (mRelatedCategory != null) {
+                    holder.mCell.isKoraanCell = mRelatedCategory.optString("title").
+                            equalsIgnoreCase(ActivityManager.QURAAN_CATEGORY);
+                }
+                holder.mCell.mDelegate = mDelegate;
                 holder.mCell.setData(object);
+
             }
         }
 
