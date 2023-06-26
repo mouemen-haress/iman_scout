@@ -10,6 +10,8 @@ import com.example.scoutchallenge.utils.LocalStorage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+
 public class ActivityManager {
 
     public static String QURAAN_CATEGORY = "مجلس القرآن الكريم";
@@ -17,6 +19,8 @@ public class ActivityManager {
     public static String WEEKLY_COURSE_CATEGORY = "الحلقة الأسبوعية";
     public static String OTHER_CATEGORY = "أخرى";
 
+    public JSONArray mCategoriesArray;
+    public HashMap<String, JSONArray> mMapActivitiesByCategory;
 
     public void getSquadCategories(ArrayCallBack callBack) {
 
@@ -53,6 +57,7 @@ public class ActivityManager {
                             }
                         }
                         callBack.onResult(categoryArray);
+                        mCategoriesArray = categoryArray;
                     }
                 } else {
                     callBack.onResult(null);
@@ -172,4 +177,27 @@ public class ActivityManager {
         });
     }
 
+    public void saveActivitiesOfCategory(String categoryId, JSONArray result) {
+        if (mMapActivitiesByCategory == null) {
+            mMapActivitiesByCategory = new HashMap<>();
+        }
+        if (categoryId != null) {
+            mMapActivitiesByCategory.put(categoryId, result);
+        }
+    }
+
+    public JSONArray getActivitiesOfCategory(String categoryId) {
+        if (mMapActivitiesByCategory != null) {
+            if (categoryId != null) {
+                return mMapActivitiesByCategory.get(categoryId);
+            }
+        }
+        return null;
+    }
+
+    public void removeActivityOfCategory(String categoryId) {
+        if (mMapActivitiesByCategory != null) {
+            mMapActivitiesByCategory.put(categoryId, null);
+        }
+    }
 }

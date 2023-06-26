@@ -32,7 +32,7 @@ import com.example.scoutchallenge.helpers.StringHelper;
 import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.DidOnFinishWork;
 import com.example.scoutchallenge.interfaces.DidOnTap;
-import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.network.MImageLoader;
 import com.google.zxing.Result;
 
@@ -270,7 +270,7 @@ public class SelectUserPopup extends HeadComponents {
             for (int i = 0; i < mUserArray.length(); i++) {
                 JSONObject user = mUserArray.optJSONObject(i);
                 if (user != null) {
-                    UserModule model = new UserModule();
+                    MemberModule model = new MemberModule();
                     model.setData(user);
                     if (model.getmSerialNumber().equalsIgnoreCase(text)) {
                         if (user.optBoolean("isChecked")) {
@@ -411,7 +411,7 @@ public class SelectUserPopup extends HeadComponents {
         protected MImageComponent mCheckIcon;
         protected boolean isChecked = false;
 
-        protected UserModule userModule = new UserModule();
+        protected MemberModule userModule = new MemberModule();
 
         public UserSelectionCell(@NonNull Context context, AttributeSet attrs) {
             super(context, attrs);

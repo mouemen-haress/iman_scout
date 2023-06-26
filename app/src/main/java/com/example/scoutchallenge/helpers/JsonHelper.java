@@ -4,6 +4,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class JsonHelper {
 
     public static JSONObject parse(String data) {
@@ -270,5 +275,20 @@ public class JsonHelper {
         return arr;
     }
 
+    public static JSONArray sort(JSONArray array) {
+        if (array != null) {
+            List asList = new ArrayList(array.length());
+            for (int i = 0; i < array.length(); i++) {
+                asList.add(array.opt(i));
+            }
+            Collections.reverse(asList);
+            JSONArray res = new JSONArray();
+            for (Object o : asList) {
+                res.put(o);
+            }
+            return res;
+        }
+        return new JSONArray();
+    }
 
 }

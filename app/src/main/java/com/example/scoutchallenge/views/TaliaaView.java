@@ -86,11 +86,11 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
     private void layoutViews() {
         int logoSize = dpToPx(100);
         int headerSize = logoSize / 2 + dpToPx(16);
-
+        int margin = dpToPx(16);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.topMargin = headerSize + logoSize / 2;
-        params.bottomMargin = dpToPx(getBottomNavHeight());
+        params.bottomMargin = dpToPx(getBottomNavHeightWithMargin() + margin);
         mTaliaaList.setLayoutParams(params);
 
     }
@@ -163,7 +163,6 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
                                     });
                                 }
                             });
-
 
 
                         } else {
@@ -310,10 +309,13 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
-        AddPopup addTaliaaPopup = new AddPopup(getContext());
-        addTaliaaPopup.mDelegate = this;
-        addTaliaaPopup.setOnTapListener(this);
-        showPopup(addTaliaaPopup);
+        int index = view1.mIndex;
+        if (index == ACTION_BTN) {
+            AddPopup addTaliaaPopup = new AddPopup(getContext());
+            addTaliaaPopup.mDelegate = this;
+            addTaliaaPopup.setOnTapListener(this);
+            showPopup(addTaliaaPopup);
+        }
     }
 
     @Override

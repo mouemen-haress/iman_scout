@@ -12,15 +12,18 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.compose.ui.graphics.Outline;
 
+import com.example.scoutchallenge.R;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
 
 import java.net.URI;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class CircularImageView extends HeadComponents {
 
-    protected ShapeableImageView mImage;
+    protected CircleImageView mImage;
 
 
     public CircularImageView(@NonNull Context context) {
@@ -29,7 +32,9 @@ public class CircularImageView extends HeadComponents {
 
     @Override
     public void init(Context ctx, AttributeSet attrs) {
-        mImage = new ShapeableImageView(ctx);
+        mImage = new CircleImageView(ctx);
+        mImage.setBorderWidth(dpToPx(3));
+        mImage.setBorderColor(getColor(R.color.headColor));
 //
 //        GradientDrawable gradientDrawable = new GradientDrawable();
 //        gradientDrawable.setShape(shape);
@@ -40,12 +45,7 @@ public class CircularImageView extends HeadComponents {
 //        gradientDrawable.setCornerRadius(50 % 100);
 
 
-        mImage.setShapeAppearanceModel(new ShapeAppearanceModel()
-                .toBuilder()
-                .setAllCorners(CornerFamily.ROUNDED, (dpToPx(80) * 50) / 100)
-                .build());
 
-        mImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         addView(mImage);
 
         layoutViews();
@@ -65,7 +65,7 @@ public class CircularImageView extends HeadComponents {
         mImage.setImageURI(uri);
     }
 
-    public ShapeableImageView getImage(){
+    public CircleImageView getImage(){
         return mImage;
     }
 

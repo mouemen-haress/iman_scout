@@ -66,11 +66,12 @@ public class PermissionsManager {
 
                 }
 
-                mStorageDelegate.onPermissionResult(false);
 
             }
         } else {
-            mStorageDelegate.onPermissionResult(true);
+            if (mStorageDelegate != null) {
+                mStorageDelegate.onPermissionResult(true);
+            }
         }
 
     }
@@ -95,13 +96,15 @@ public class PermissionsManager {
                     }, new DidOnTap() {
                         @Override
                         public void onTap(HeadComponents view) {
-
+                            if (mCameraDelegate != null) {
+                                mCameraDelegate.onPermissionResult(false);
+                            }
                         }
                     });
 
                 }
 
-                mCameraDelegate.onPermissionResult(false);
+
 
             }
         } else {
@@ -110,7 +113,8 @@ public class PermissionsManager {
 
     }
 
-    public void handlePermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void handlePermissionResult(int requestCode, @NonNull String[] permissions,
+                                       @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_CAMERA_CODE:
                 if (mCameraDelegate == null) {

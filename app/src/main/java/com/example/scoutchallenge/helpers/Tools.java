@@ -29,9 +29,11 @@ import androidx.navigation.NavController;
 
 import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.R;
+import com.example.scoutchallenge.activities.MainActivity;
 import com.example.scoutchallenge.conponents.HeadComponents;
 import com.example.scoutchallenge.conponents.popups.SimplePopup;
 import com.example.scoutchallenge.interfaces.DidOnTap;
+import com.example.scoutchallenge.interfaces.OnSimplePopupDelegate;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.json.JSONArray;
@@ -125,6 +127,15 @@ public class Tools {
         return gradientDrawable;
     }
 
+    public static int getBottomNavHeightWithMargin() {
+        Resources resources = App.getSharedInstance().mMyActivity.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId) + dpToPx(20);
+        }
+        return 0;
+    }
+
     public static int getBottomNavHeight() {
         Resources resources = App.getSharedInstance().mMyActivity.getResources();
         int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
@@ -133,6 +144,7 @@ public class Tools {
         }
         return 0;
     }
+
 
     public static int getColor(int color) {
         return ResourcesCompat.getColor(App.getSharedInstance().mMyActivity.getResources(), color, null); //without theme
@@ -155,6 +167,9 @@ public class Tools {
         view.setBackgroundColor(getColor(R.color.headColor));
         return view;
     }
+    public static int getImage(String key) {
+        return D.getResourceId(key);
+    }
 
     public static void hidePopup() {
         runOnUIThread(() -> {
@@ -163,6 +178,14 @@ public class Tools {
             }
         });
 
+    }
+
+    public static String getString(int id) {
+        MainActivity activity = App.getSharedInstance().mMyActivity;
+        if (activity != null) {
+            return activity.getResources().getString(id);
+        }
+        return "";
     }
 
     public static void showPopup(HeadComponents view) {
@@ -189,10 +212,16 @@ public class Tools {
             SimplePopup simplePopup = new SimplePopup(App.getSharedInstance().mMyActivity);
             simplePopup.setDescription(des);
 
-            simplePopup.mDelegate = new DidOnTap() {
+            simplePopup.mDelegate = new OnSimplePopupDelegate() {
                 @Override
-                public void onTap(HeadComponents view) {
+                public void onConfirm() {
                     hidePopup();
+                }
+
+                @Override
+                public void onCancel() {
+                    hidePopup();
+
                 }
             };
 
@@ -209,13 +238,21 @@ public class Tools {
 
             SimplePopup simplePopup = new SimplePopup(App.getSharedInstance().mMyActivity);
             simplePopup.setDescription(des);
+            simplePopup.showCancelButton();
 
-            simplePopup.mDelegate = new DidOnTap() {
+            simplePopup.mDelegate = new OnSimplePopupDelegate() {
                 @Override
-                public void onTap(HeadComponents view) {
+                public void onConfirm() {
                     hidePopup();
                     if (delegate != null) {
                         delegate.onTap(new HeadComponents(App.getSharedInstance().mMyActivity));
+                    }
+                }
+
+                @Override
+                public void onCancel() {
+                    if (cancelDelegate != null) {
+                        cancelDelegate.onTap(new HeadComponents(App.getSharedInstance().mMyActivity));
                     }
                 }
             };

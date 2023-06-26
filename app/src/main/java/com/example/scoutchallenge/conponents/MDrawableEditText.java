@@ -76,6 +76,7 @@ public class MDrawableEditText extends HeadComponents {
 
 
         mEditText = new MEditText(ctx, null);
+        mEditText.getEditText().setSingleLine();
         mEditText.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -309,7 +310,7 @@ public class MDrawableEditText extends HeadComponents {
         LayoutParams params = (LayoutParams) mEditText.getLayoutParams();
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         mEditText.setLayoutParams(params);
-
+        mEditText.getEditText().setSingleLine(false);
         mEditText.getEditText().setLines(lines);
 
     }

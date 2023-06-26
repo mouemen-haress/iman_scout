@@ -114,7 +114,7 @@ public class OnsorMatrixView extends HeadView {
         params.setMarginEnd(margin);
         params.setMarginStart(margin);
         params.topMargin = getHeadSize() + searchHeight + margin;
-        params.bottomMargin = getBottomNavHeight();
+        params.bottomMargin = getBottomNavHeightWithMargin()+margin;
         mUserList.setLayoutParams(params);
 
     }
@@ -194,10 +194,13 @@ public class OnsorMatrixView extends HeadView {
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
-        if (!Core.getInstance().isLeader()) {
-            showSimplePopup(getString(R.string.you_dont_have_a_permission));
-            return;
+        int index = view1.mIndex;
+        if (index == ACTION_BTN) {
+            if (!Core.getInstance().isLeader()) {
+                showSimplePopup(getString(R.string.you_dont_have_a_permission));
+                return;
+            }
+            pushView(R.id.onsorView);
         }
-        pushView(R.id.onsorView);
     }
 }

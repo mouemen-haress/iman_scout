@@ -14,26 +14,27 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.HeadComponents;
+import com.example.scoutchallenge.conponents.Loader;
 import com.example.scoutchallenge.conponents.MImageComponent;
 import com.example.scoutchallenge.conponents.MTextView;
-import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.RecyclerItemClickListener;
 import com.example.scoutchallenge.helpers.StringHelper;
+import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
-import com.example.scoutchallenge.models.MemberModule;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 
 public class HomeView extends HeadView {
-    protected RecyclerView mChallengeList;
+    protected RecyclerView mCategoriesList;
     protected ListAdapter mAdapter;
     protected GridLayoutManager mMyManager;
+    public RecyclerView.OnItemTouchListener mRecyclerListener;
+    protected Loader mLoader;
 
     int mCellSize = dpToPx(150);
 
@@ -68,10 +69,10 @@ public class HomeView extends HeadView {
 
         mMyManager = new GridLayoutManager(getContext(), RecyclerView.VERTICAL);
         mMyManager.setSpanCount(2);
-        mChallengeList = new RecyclerView(ctx);
-        mChallengeList.setAdapter(mAdapter);
-        mChallengeList.setLayoutManager(mMyManager);
-        mChallengeList.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), mChallengeList, new RecyclerItemClickListener.OnItemClickListener() {
+        mCategoriesList = new RecyclerView(ctx);
+        mCategoriesList.setAdapter(mAdapter);
+        mCategoriesList.setLayoutManager(mMyManager);
+        mRecyclerListener = new RecyclerItemClickListener(getContext(), mCategoriesList, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 JSONObject currentObj = (JSONObject) mAdapter.mDataSource.opt(position);
@@ -85,9 +86,14 @@ public class HomeView extends HeadView {
             @Override
             public void onItemLongClick(View view, int position) {
             }
-        }));
+        });
+
+        mCategoriesList.addOnItemTouchListener(mRecyclerListener);
         mCellSize = getBestCellSizing(dpToPx(16), 2);
-        mRootView.addView(mChallengeList);
+        mRootView.addView(mCategoriesList);
+
+        mLoader = new Loader(ctx);
+        mRootView.addView(mLoader);
 
         fillCategories();
         layoutViews();
@@ -95,14 +101,18 @@ public class HomeView extends HeadView {
 
 
     private void fillCategories() {
+        mLoader.showLoader();
+        JSONArray localCategories = BackendProxy.getInstance().mActivityManager.mCategoriesArray;
+        if (localCategories != null && localCategories.length() > 0) {
+            refreshAdapter(localCategories);
+
+        }
+
         BackendProxy.getInstance().mActivityManager.getSquadCategories(new ArrayCallBack() {
             @Override
             public void onResult(JSONArray array) {
                 if (array != null) {
-                    mAdapter.mDataSource = array;
-                    runOnUiThread(() -> {
-                        mAdapter.notifyDataSetChanged();
-                    });
+                    refreshAdapter(array);
                 }
 
             }
@@ -117,7 +127,12 @@ public class HomeView extends HeadView {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.topMargin = getHeadSize();
         params.setMarginEnd(margin);
-        mChallengeList.setLayoutParams(params);
+        params.bottomMargin = Tools.getBottomNavHeightWithMargin()+margin;
+        mCategoriesList.setLayoutParams(params);
+
+        params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        mLoader.setLayoutParams(params);
 
     }
 
@@ -128,13 +143,21 @@ public class HomeView extends HeadView {
     }
 
 
+    public void refreshAdapter(JSONArray array) {
+        mAdapter.mDataSource = array;
+        runOnUiThread(() -> {
+            mLoader.hideLoader();
+            mAdapter.notifyDataSetChanged();
+        });
+    }
+
     public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CellViewHolder> {
 //
 //        protected static final int HORIZONTAL_CELL = 0;
 //        protected static final int VERTICAL_CELL = 1;
 
 
-        JSONArray mDataSource;
+        public JSONArray mDataSource;
 
         @Override
         public int getItemViewType(int position) {
@@ -218,7 +241,7 @@ public class HomeView extends HeadView {
             mName.setTextColor(getColor(R.color.headColor));
             addView(mName);
 
-            setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), 2,getColor( R.color.headColor)));
+            setBackground(getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), 2, getColor(R.color.headColor)));
             layoutViews();
         }
 
@@ -234,8 +257,8 @@ public class HomeView extends HeadView {
 
             params = new LayoutParams(mCellSize, ViewGroup.LayoutParams.MATCH_PARENT);
             mName.getLabel().setGravity(Gravity.CENTER);
-            params.bottomMargin = margin/2;
-            params.topMargin = iconSize + (mCellSize/2)- iconSize/2;
+            params.bottomMargin = margin / 2;
+            params.topMargin = iconSize + (mCellSize / 2) - iconSize / 2;
             mName.setLayoutParams(params);
 
             params = new LayoutParams(mCellSize, mCellSize);
@@ -264,7 +287,10 @@ public class HomeView extends HeadView {
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
-        pushView(R.id.scanView);
+        int index = view1.mIndex;
+        if (index == ACTION_BTN) {
+            pushView(R.id.scanView);
+        }
     }
 
     @Override

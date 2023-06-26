@@ -10,8 +10,11 @@ public class D {
 
     // Api
 //    public final static String URL = "http://api-kachaf.herokuapp.com/api";
-    public final static String URL = "http://192.168.1.111:8080/api";
-    public final static String ASSET_URL = "http://192.168.1.111:8080";
+    public final static String URL = "http://192.168.1.111:8080";
+    public final static String ASSET_URL = "https://nodekachaf.onrender.com";
+
+//    public final static String URL = "http://192.168.1.111:8080/api";
+//    public final static String ASSET_URL = "http://192.168.1.111:8080";
 
 
     public final static String SALAT_ROOT = "/get-prayer";
@@ -25,6 +28,8 @@ public class D {
     public final static String ADD_USER = "/register";
     public final static String DELET_USER_ACTIVITIES = "/delete-user-activities";
     public final static String UPDATE_USER = "/update-user";
+    public final static String GET_ONSOR_ACTIVITIES = "/get-onsor-activities";
+
     public final static String DELETE_ACTIVITIES = "/delete-activities";
     public final static String DELETE_USER_TALIAA = "/delete-user-taliaa";
     public final static String UPDATE_NOTE_ACTIVITIES = "/update-note-activities";
@@ -74,6 +79,7 @@ public class D {
         mResourceMap.put("green_koran", new Integer(R.drawable.green_koran));
         mResourceMap.put("suicide", new Integer(R.drawable.suicide));
         mResourceMap.put("true_icon", new Integer(R.drawable.true_icon));
+        mResourceMap.put("analysis", new Integer(R.drawable.analysis));
 
 
         if (mResourceMap.containsKey(resource)) {

@@ -1,8 +1,8 @@
 package com.example.scoutchallenge.conponents;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -15,7 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scoutchallenge.R;
-import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.helpers.Tools;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.network.MImageLoader;
 
 import org.json.JSONArray;
@@ -75,7 +76,7 @@ public class MatrixColumComponent extends HeadComponents {
 
         params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.topMargin = margin;
-        params.bottomMargin = getBottomNavHeight() + margin;
+        params.bottomMargin = Tools.getBottomNavHeightWithMargin() + margin;
         params.setMarginStart(margin);
         setLayoutParams(params);
 
@@ -167,7 +168,7 @@ public class MatrixColumComponent extends HeadComponents {
 
     public class OnsorCell extends HeadComponents {
 
-        protected ImageView mImage;
+        protected CircularImageView mImage;
         protected HeadComponents mLine;
 
         protected MTextView mNameLabel;
@@ -184,15 +185,14 @@ public class MatrixColumComponent extends HeadComponents {
         public void init(Context ctx, AttributeSet attrs) {
             super.init(ctx, attrs);
 
-            mImage = new ImageView(ctx);
+            mImage = new CircularImageView(ctx);
             mImage.setImageResource(getImage("onsor"));
-            mImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
             addView(mImage);
 
 
             mLine = new HeadComponents(ctx);
             mLine.setBackgroundColor(getColor(R.color.headColor));
-            addView(mLine);
+//            addView(mLine);
 
             mNameLabel = new MTextView(ctx);
             mNameLabel.setText("ديب شموط");
@@ -203,8 +203,8 @@ public class MatrixColumComponent extends HeadComponents {
             addView(mNameLabel);
 
 
-            GradientDrawable gradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), 2, getColor(R.color.headColor));
-            setBackground(gradientDrawable);
+//            GradientDrawable gradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.white, dpToPx(10), 2, getColor(R.color.headColor));
+//            setBackground(gradientDrawable);
 
             layoutViews();
         }
@@ -215,7 +215,8 @@ public class MatrixColumComponent extends HeadComponents {
 
             int margin = dpToPx(16) / 2;
 
-            LayoutParams params = new LayoutParams(cellSize, iconSize);
+            LayoutParams params = new LayoutParams(iconSize, iconSize);
+            params.gravity = Gravity.CENTER_HORIZONTAL;
             mImage.setLayoutParams(params);
 
             params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(2));
@@ -232,7 +233,6 @@ public class MatrixColumComponent extends HeadComponents {
             params.bottomMargin = margin;
             mNameLabel.setLayoutParams(params);
 
-
             params = new LayoutParams(cellSize, cellSize);
             params.topMargin = margin;
             setLayoutParams(params);
@@ -242,13 +242,13 @@ public class MatrixColumComponent extends HeadComponents {
         public void setData(JSONObject data) {
             super.setData(data);
             if (data != null) {
-                UserModule userModule = new UserModule();
+                MemberModule userModule = new MemberModule();
                 userModule.setData(data);
 
                 String name = data.optString("Name");
                 mNameLabel.setText(name);
 
-                MImageLoader.loadWithGlide(userModule.getImageUrl(), 0, mImage);
+                MImageLoader.loadWithGlide(userModule.getImageUrl(), 0, mImage.getImage());
             }
         }
 

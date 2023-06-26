@@ -1,11 +1,11 @@
 package com.example.scoutchallenge;
 
-import android.app.Activity;
 import android.app.Application;
 
-import com.example.scoutchallenge.activities.MainActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
-import org.json.JSONArray;
+import com.example.scoutchallenge.activities.MainActivity;
 
 public class App extends Application {
 
@@ -28,5 +28,10 @@ public class App extends Application {
         return (MainActivity) mMyActivity;
     }
 
-
+    public void popBackStack() {
+        NavController navController = mMyActivity.getNavController();
+        if (navController != null) {
+            navController.popBackStack();
+        }
+    }
 }

@@ -76,6 +76,14 @@
         android:label="TaliaaUserListView" />
     <fragment
         android:id="@+id/moufawadHomeView"
-        android:name="com.example.scoutchallenge.views.MoufawadHomeView"
+        android:name="com.example.scoutchallenge.views.moufawad_views.MoufawadHomeView"
         android:label="MoufawadHomeView" />
+    <fragment
+        android:id="@+id/onsorHomeView"
+        android:name="com.example.scoutchallenge.views.onsor_views.OnsorHomeView"
+        android:label="OnsorHomeView" />
+    <fragment
+        android:id="@+id/statisticOnsorView"
+        android:name="com.example.scoutchallenge.views.onsor_views.StatisticOnsorView"
+        android:label="StatisticOnsorView" />
 </navigation>

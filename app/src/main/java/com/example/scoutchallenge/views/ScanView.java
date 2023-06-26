@@ -3,7 +3,6 @@ package com.example.scoutchallenge.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -15,7 +14,7 @@ import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.helpers.PermissionsManager;
 import com.example.scoutchallenge.helpers.StringHelper;
 import com.example.scoutchallenge.interfaces.DidPermissionGrainted;
-import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.models.MemberModule;
 import com.google.zxing.Result;
 
 public class ScanView extends HeadView {
@@ -28,7 +27,7 @@ public class ScanView extends HeadView {
         PermissionsManager.getInstance().requestCameraDelegate(new DidPermissionGrainted() {
             @Override
             public void onPermissionResult(boolean trueOrFalse) {
-                if(false){
+                if (!trueOrFalse) {
                     popBackStack();
                 }
             }
@@ -42,7 +41,7 @@ public class ScanView extends HeadView {
                 runOnUiThread(() -> {
                     String resultText = result.getText();
                     if (!StringHelper.isNullOrEmpty(resultText)) {
-                        UserModule userModel = new UserModule();
+                        MemberModule userModel = new MemberModule();
                         userModel = BackendProxy.getInstance().mUserManager.getUserBySerialNumber(resultText);
                         if (userModel != null && userModel.getData() != null) {
                             Bundle bundle = new Bundle();

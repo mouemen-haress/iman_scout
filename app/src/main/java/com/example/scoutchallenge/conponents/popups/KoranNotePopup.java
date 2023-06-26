@@ -1,6 +1,8 @@
 package com.example.scoutchallenge.conponents.popups;
 
 import android.content.Context;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -11,10 +13,10 @@ import androidx.annotation.NonNull;
 
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.conponents.HeadComponents;
-import com.example.scoutchallenge.conponents.MButtonComponent;
 import com.example.scoutchallenge.conponents.MDrawableEditText;
 import com.example.scoutchallenge.conponents.MImageComponent;
 import com.example.scoutchallenge.conponents.MTextView;
+import com.example.scoutchallenge.helpers.InputHelper;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.interfaces.CallBack;
 
@@ -74,6 +76,8 @@ public class KoranNotePopup extends HeadComponents {
 
         mRate = new MDrawableEditText(ctx);
         mRate.setPlaceHolder(getString(R.string.rating));
+        mRate.setInpuType(InputType.TYPE_CLASS_NUMBER);
+        mRate.getEditText().setFilters(new InputFilter[]{new InputHelper("0", "20")});
         mcontainer.addView(mRate);
 
         mNext = new MDrawableEditText(ctx);

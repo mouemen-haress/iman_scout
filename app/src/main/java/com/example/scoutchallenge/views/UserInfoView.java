@@ -25,6 +25,7 @@ public class UserInfoView extends AddUserView {
     public void init(Context ctx, View view) {
         super.init(ctx, view);
 
+        mEmail.getEditText().setEnabled(false);
         mSubmitBtn.setOnTapListener(view1 -> {
             updateUser();
         });
@@ -32,6 +33,7 @@ public class UserInfoView extends AddUserView {
         mProfile.setOnTapListener(view1 -> {
             showToast(getString(R.string.you_can_not_update_profile));
         });
+
 
         mPassword.show();
         injectUIData();

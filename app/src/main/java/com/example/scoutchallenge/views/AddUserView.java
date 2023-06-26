@@ -42,8 +42,8 @@ import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.CategoriesMenuDelegate;
 import com.example.scoutchallenge.interfaces.DidOnTap;
 import com.example.scoutchallenge.interfaces.DidPermissionGrainted;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.models.TaliaaModel;
-import com.example.scoutchallenge.models.UserModule;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
 import org.json.JSONArray;
@@ -70,7 +70,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
     private static final String[] MENU_IDS = {SELF_INFOS, FATHER_INFOS, MOTHER_INFOS, SOCIAL_INFOS, TaliaaModel.OTHER};
     Map<String, LinearLayout> mContainerMap;
-    UserModule mUserModule = new UserModule();
+    MemberModule mUserModule = new MemberModule();
 
     CategoriesComponent mCategoriesMenu;
     protected NestedScrollView mScrollView;
@@ -122,7 +122,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
     protected MButtonComponent mSubmitBtn;
 
 
-    protected UserModule mModule;
+    protected MemberModule mModule;
     protected String mCurrentSelectedSection;
     protected int mCurrentSelectedPosition = 0;
     protected Uri mImageUri = null;
@@ -136,7 +136,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         PermissionsManager.getInstance().requestStoragePermesssion(new DidPermissionGrainted() {
             @Override
             public void onPermissionResult(boolean trueOrFalse) {
-                if(false){
+                if (!trueOrFalse) {
                     popBackStack();
                 }
             }
@@ -454,71 +454,72 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
     }
 
     private void addUser() {
-        fillUserModel();
-        showLockedLoading();
+        if (canPassOtherContainer() || D.IS_STIMILATE_ADD_USER_ENABLED) {
 
-        BackendProxy.getInstance().mUserManager.addUser(mUserModule, new CallBack() {
-            @Override
-            public void onResult(String response) {
-                runOnUiThread(() -> {
-                    if (response != null) {
-                        showSimplePopup(getString(R.string.user_added_success));
-                        BackendProxy.getInstance().mUserManager.getAllUser(new ArrayCallBack() {
-                            @Override
-                            public void onResult(JSONArray array) {
-                                if (array != null) {
-                                    runOnUiThread(() -> {
-                                        hideLockedLoading();
-                                        App.getSharedInstance().getMainActivity().injectTaliaaUSerDataLocaly(null);
-                                        popBackStack();
+            fillUserModel();
+            showLockedLoading();
 
-                                    });
+            BackendProxy.getInstance().mUserManager.addUser(mUserModule, new CallBack() {
+                @Override
+                public void onResult(String response) {
+                    runOnUiThread(() -> {
+                        if (response != null) {
+                            showSimplePopup(getString(R.string.user_added_success));
+                            BackendProxy.getInstance().mUserManager.getAllUser(new ArrayCallBack() {
+                                @Override
+                                public void onResult(JSONArray array) {
+                                    if (array != null) {
+                                        runOnUiThread(() -> {
+                                            hideLockedLoading();
+                                            App.getSharedInstance().getMainActivity().injectTaliaaUSerDataLocaly(null);
+                                            popBackStack();
+
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
 
 
-                    } else {
-                        showSimplePopup(getString(R.string.server_error));
-                    }
-                });
-            }
-        });
+                        } else {
+                            showSimplePopup(getString(R.string.server_error));
+                        }
+                    });
+                }
+            });
+        }
     }
 
     public void fillUserModel() {
-        if (canPassOtherContainer() || D.IS_STIMILATE_ADD_USER_ENABLED) {
-            mUserModule.setName(mName.getText().trim());
-            mUserModule.setmEmail(mEmail.getText().trim());
-            mUserModule.setmDateOfBirth(mDate.getText());
-            mUserModule.setmRegisterNumber(mNumber.getText().trim());
-            mUserModule.setmPersonalBloodType(mBloodType.getText().trim());
-            mUserModule.setmHasClothes(mClothesSwitch.isChecked());
-            if (mSelectedTaliaaPosition != -1) {
-                JSONArray taliaaList = BackendProxy.getInstance().mTaliaaManager.mTaliaaList;
-                if (taliaaList != null) {
-                    JSONObject taliaaObj = JsonHelper.getJSONObject(taliaaList, mSelectedTaliaaPosition);
-                    mUserModule.setTaliaaId(taliaaObj.optString("_id"));
-                }
-
+        mUserModule.setName(mName.getText().trim());
+        mUserModule.setmEmail(mEmail.getText().trim());
+        mUserModule.setmDateOfBirth(mDate.getText());
+        mUserModule.setmRegisterNumber(mNumber.getText().trim());
+        mUserModule.setmPersonalBloodType(mBloodType.getText().trim());
+        mUserModule.setmHasClothes(mClothesSwitch.isChecked());
+        if (mSelectedTaliaaPosition != -1) {
+            JSONArray taliaaList = BackendProxy.getInstance().mTaliaaManager.mTaliaaList;
+            if (taliaaList != null) {
+                JSONObject taliaaObj = JsonHelper.getJSONObject(taliaaList, mSelectedTaliaaPosition);
+                mUserModule.setTaliaaId(taliaaObj.optString("_id"));
             }
-            mUserModule.setmFerkaName(mFatherName.getText().trim());
-            mUserModule.setMfhaterBloodType(mFatherBloodType.getText().trim());
-            mUserModule.setmFhaterPhone(mFatherNumber.getText().trim());
-            mUserModule.setmFatherWork(mFatherWork.getText().trim());
-            mUserModule.setmMotherName(mMotherName.getText().trim());
-            mUserModule.setmMotherBloodType(mMotherBloodType.getText().trim());
-            mUserModule.setmMotherPhone(mMotherNumber.getText().trim());
-            mUserModule.setmMotherWork(mMotherWork.getText().trim());
-            mUserModule.setmPlaceOfBirth(mPlaceOfBirth.getText().trim());
-            mUserModule.setmAddress(mAddress.getText().trim());
-            mUserModule.setFamilyNb(mNbOfFamily.getText().trim());
-            mUserModule.setmAddressType(mAddressType.getText().trim());
-            mUserModule.setmSchool(mCurrentEducation.getText().trim());
-            mUserModule.setmIsHasChronicDisease(mIllness.getText().trim());
-            mUserModule.setmIsHasOtherAssociation(mInsurance.getText().trim());
-            mUserModule.setmPassword(getPassword());
+
         }
+        mUserModule.setmFerkaName(mFatherName.getText().trim());
+        mUserModule.setMfhaterBloodType(mFatherBloodType.getText().trim());
+        mUserModule.setmFhaterPhone(mFatherNumber.getText().trim());
+        mUserModule.setmFatherWork(mFatherWork.getText().trim());
+        mUserModule.setmMotherName(mMotherName.getText().trim());
+        mUserModule.setmMotherBloodType(mMotherBloodType.getText().trim());
+        mUserModule.setmMotherPhone(mMotherNumber.getText().trim());
+        mUserModule.setmMotherWork(mMotherWork.getText().trim());
+        mUserModule.setmPlaceOfBirth(mPlaceOfBirth.getText().trim());
+        mUserModule.setmAddress(mAddress.getText().trim());
+        mUserModule.setFamilyNb(mNbOfFamily.getText().trim());
+        mUserModule.setmAddressType(mAddressType.getText().trim());
+        mUserModule.setmSchool(mCurrentEducation.getText().trim());
+        mUserModule.setmIsHasChronicDisease(mIllness.getText().trim());
+        mUserModule.setmIsHasOtherAssociation(mInsurance.getText().trim());
+        mUserModule.setmPassword(getPassword());
 
     }
 
@@ -544,7 +545,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         params.setMarginStart(margin);
         params.setMarginEnd(margin);
         params.topMargin = margin + categoriesHeight;
-        params.bottomMargin = margin + getBottomNavHeight();
+        params.bottomMargin = margin + getBottomNavHeightWithMargin();
 
         mScrollView.setLayoutParams(params);
 
@@ -555,7 +556,6 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         mProfile.setLayoutParams(linearParams);
         mName.setLayoutParams(linearParams);
         mEmail.setLayoutParams(linearParams);
-        mDate.setLayoutParams(linearParams);
         mBloodType.setLayoutParams(linearParams);
         mTaliaaSpinner.setLayoutParams(linearParams);
         mTaliaaSpinner.setPadding(margin / 2, margin / 2, margin / 2, margin / 2);
@@ -579,6 +579,9 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
         mHobbies.setLayoutParams(linearParams);
         mInsurance.setLayoutParams(linearParams);
         mIllness.setLayoutParams(linearParams);
+
+        params = new FrameLayout.LayoutParams(btnHeight,btnHeight);
+        mDate.setLayoutParams(linearParams);
 
 
         linearParams = new LinearLayout.LayoutParams(icon, icon);

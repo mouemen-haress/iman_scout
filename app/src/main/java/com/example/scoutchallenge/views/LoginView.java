@@ -50,8 +50,7 @@ public class LoginView extends HeadView {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.login_view_layout, container, false);
     }
@@ -105,9 +104,9 @@ public class LoginView extends HeadView {
             String email = mEmailEditText.getText().trim();
             String password = mPasswordEditText.getText().trim();
 
-            //leader
-            email = "alloush32@live.com";
-            password = "alloush32";
+//          leader
+//            email = "alloush32@live.com";
+//            password = "alloush32";
 
 //            email = "helping32@live.com";
 //            password = "helping32";
@@ -116,20 +115,28 @@ public class LoginView extends HeadView {
 //            email = "mfd32@live.com";
 //            password = "mfd32";
 
+//            user
+//            email = "mouemen@iman.com";
+//            password = "11111111";
+
+            //           ktor user
+            email = "moemen";
+            password = "11111111";
+
+
             BackendProxy.getInstance().mLoginManager.authenticate(email, password, new CallBack() {
                 @Override
                 public void onResult(String response) {
                     runOnUiThread(() -> {
                         hideLockedLoading();
-
                         if (response != null) {
                             if (response.equalsIgnoreCase(LoginManager.SUCCESS_LOGIN)) {
-                                runOnUiThread(() -> {
-                                    pushAndSetRootView(R.id.loginView, R.id.bootView);
-                                });
+                                pushAndSetRootView(R.id.loginView, R.id.bootView);
+                                return;
                             } else {
                                 showSimplePopup(response);
                             }
+
 
                         } else {
                             showSimplePopup(getString(R.string.server_error));

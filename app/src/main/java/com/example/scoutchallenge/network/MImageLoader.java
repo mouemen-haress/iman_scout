@@ -15,6 +15,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.scoutchallenge.App;
+import com.example.scoutchallenge.R;
+import com.example.scoutchallenge.helpers.AnimationHelper;
+import com.example.scoutchallenge.helpers.Tools;
 
 public class MImageLoader {
     private static int TIME_OUT = 40000;
@@ -22,10 +25,12 @@ public class MImageLoader {
 
     public static void loadWithGlide(String pictureUrl, int placeHolder, ImageView imageView) {
         try {
+            AnimationHelper.shimmer(imageView, 0.3f, 1f, 700, true);
+
             RequestOptions options = new RequestOptions()
                     .centerCrop()
-                    .placeholder(placeHolder)
-                    .error(placeHolder)
+                    .placeholder(Tools.getImage("user"))
+                    .error(Tools.getImage("false_icon"))
                     .dontAnimate()
                     .set(HttpGlideUrlLoader.TIMEOUT, TIME_OUT);
 
@@ -35,11 +40,13 @@ public class MImageLoader {
                     if (e != null) {
 
                     }
+                    imageView.clearAnimation();
                     return false;
                 }
 
                 @Override
                 public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                    imageView.clearAnimation();
                     return false;
                 }
             }).into(imageView);

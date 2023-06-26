@@ -32,8 +32,7 @@ import com.example.scoutchallenge.interfaces.DidOnFinishWork;
 import com.example.scoutchallenge.interfaces.DidOnTap;
 import com.example.scoutchallenge.interfaces.OnCellSwipe;
 import com.example.scoutchallenge.interfaces.OnObjectCallBack;
-import com.example.scoutchallenge.models.UserModule;
-import com.example.scoutchallenge.network.ApiClient;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.views.cells.UserCell;
 
 import org.json.JSONArray;
@@ -49,6 +48,8 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
     protected JSONArray mCurrentUserList;
     protected JSONArray mOtherUserList;
     public OnObjectCallBack mDelegate;
+
+    protected String mCurrentCategoryId;
 
     public ActivityUserListView() {
         // Required empty public constructor
@@ -111,7 +112,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
             public void OnObject(JSONObject object) {
                 if (object != null) {
                     JSONObject userData = object;
-                    UserModule userModule = new UserModule();
+                    MemberModule userModule = new MemberModule();
                     if (userData.optJSONObject("userId") != null) {
                         userModule.setData(userData.optJSONObject("userId"));
                     }
@@ -203,7 +204,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
         params.topMargin = getHeadSize() + margin;
         params.setMarginEnd(margin);
         params.setMarginStart(margin);
-        params.bottomMargin = getBottomNavHeight() + margin / 2;
+        params.bottomMargin = getBottomNavHeightWithMargin() + margin / 2;
         mHeaderText.getLabel().setGravity(Gravity.CENTER);
 //        mHeaderText.setMinimumHeight(headerSize);
         mHeaderText.setLayoutParams(params);
@@ -213,7 +214,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 
         params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.topMargin = getHeadSize() + textHeight + margin;
-        params.bottomMargin = getBottomNavHeight() + margin / 2;
+        params.bottomMargin = getBottomNavHeightWithMargin() + margin;
         mUserList.setLayoutParams(params);
 
     }
@@ -238,6 +239,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
         JSONObject obj = JsonHelper.parse(dataString);
         if (obj != null) {
             mRelatedCategory = obj;
+            mCurrentCategoryId = mRelatedCategory.optString("_id");
         }
     }
 
@@ -273,6 +275,7 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
                                         runOnUiThread(() -> {
                                             hideLockedLoading();
                                             mAdapter.mDataSource.remove(position);
+                                            removeCurrentCategoryActivities();
                                             fillUsers();
                                         });
                                     }
@@ -291,6 +294,13 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
             });
         }
     }
+
+    private void removeCurrentCategoryActivities() {
+        if (!StringHelper.isNullOrEmpty(mCurrentCategoryId)) {
+            BackendProxy.getInstance().mActivityManager.removeActivityOfCategory(mCurrentCategoryId);
+        }
+    }
+
 
     @Override
     public void onFinishWork(JSONArray array) {
@@ -313,6 +323,8 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 
                                     if (finalI == arrayLenght - 1) {
                                         hideLockedLoading();
+                                        removeCurrentCategoryActivities();
+
                                     }
                                     if (response != null) {
                                         JSONArray lastUserArray = mRelatedObj.optJSONArray("users");
@@ -425,20 +437,21 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
+        int index = view1.mIndex;
+        if (index == ACTION_BTN) {
+            if (mOtherUserList != null && mOtherUserList.length() == 0) {
+                showToast(getString(R.string.all_user_add));
+                return;
+            }
+            SelectUserPopup addUserPopup = new SelectUserPopup(getContext());
+            if (mOtherUserList != null) {
+                addUserPopup.setUserArray(mOtherUserList);
+            } else {
+                addUserPopup.setUserArray(BackendProxy.getInstance().mUserManager.mAllUserList);
+            }
+            addUserPopup.mDelegate = this;
+            showPopup(addUserPopup);
 
-        if (mOtherUserList != null && mOtherUserList.length() == 0) {
-            showToast(getString(R.string.all_user_add));
-            return;
         }
-        SelectUserPopup addUserPopup = new SelectUserPopup(getContext());
-        if (mOtherUserList != null) {
-            addUserPopup.setUserArray(mOtherUserList);
-        } else {
-            addUserPopup.setUserArray(BackendProxy.getInstance().mUserManager.mAllUserList);
-        }
-        addUserPopup.mDelegate = this;
-        showPopup(addUserPopup);
-
-
     }
 }

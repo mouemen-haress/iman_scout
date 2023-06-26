@@ -3,24 +3,14 @@ package com.example.scoutchallenge.views;
 import android.content.Context;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.R;
-import com.example.scoutchallenge.backend.BackendProxy;
-import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.helpers.Tools;
-import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.models.MemberModule;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 
 public class BootView extends HeadView {
@@ -56,6 +46,10 @@ public class BootView extends HeadView {
                 pushView(R.id.moufawadHomeView);
                 break;
 
+            case MemberModule.ONSOR:
+                fetchOnsorData();
+                break;
+
             default:
                 Tools.showSimplePopup(getString(R.string.server_error));
                 pushAndSetRootView(R.id.bootView, R.id.loginView);
@@ -66,6 +60,19 @@ public class BootView extends HeadView {
         setMenu(position);
 
 
+    }
+
+    private void fetchOnsorData() {
+        App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
+            @Override
+            public void onResult(String response) {
+                if (response != null) {
+                    pushAndSetRootView(R.id.bootView, R.id.onsorHomeView);
+                } else {
+                    Tools.showSimplePopup(getString(R.string.server_error));
+                }
+            }
+        });
     }
 
     private void fetchHelpingLeaderData() {

@@ -5,17 +5,20 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.conponents.HeadComponents;
+import com.example.scoutchallenge.conponents.Loader;
 import com.example.scoutchallenge.conponents.MDrawableEditText;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.conponents.MyRecyclerView;
@@ -38,7 +41,10 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
     protected MyRecyclerView mAvtivitiesList;
     protected ListAdapter mAdapter;
     protected LinearLayoutManager mMyManager;
+
     private JSONObject mRelatedCategoryObj;
+    private Loader mLoader;
+    private String mCurrentCategoryId;
 
     public ActivitiesView() {
         // Required empty public constructor
@@ -100,6 +106,10 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
         mRootView.addView(mAvtivitiesList);
 
 
+        mLoader = new Loader(ctx);
+        mRootView.addView(mLoader);
+
+
         fillActivities();
         layoutViews();
     }
@@ -110,26 +120,37 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
         JSONObject obj = JsonHelper.parse(dataString);
         if (obj != null) {
             mRelatedCategoryObj = obj;
+            mCurrentCategoryId = mRelatedCategoryObj.optString("_id");
         }
 
     }
 
     private void fillActivities() {
+        mLoader.showLoader();
+
         if (mRelatedCategoryObj != null) {
             String categoryId = mRelatedCategoryObj.optString("_id");
             if (!StringHelper.isNullOrEmpty(categoryId)) {
+                JSONArray localActivities = BackendProxy.getInstance().mActivityManager.getActivitiesOfCategory(categoryId);
+                if (localActivities != null) {
+                    refreshAdapter(localActivities);
+                    return;
+                }
                 BackendProxy.getInstance().mActivityManager.getActivitiesOfCategory(categoryId, new CallBack() {
                     @Override
                     public void onResult(String response) {
                         if (response != null) {
                             JSONObject respObject = JsonHelper.parse(response);
-                            JSONArray result = respObject.optJSONArray("activities");
-
-                            mAdapter.mDataSource = result;
-                            runOnUiThread(() -> {
-                                mAdapter.notifyDataSetChanged();
-
-                            });
+                            if (respObject != null) {
+                                JSONArray result = respObject.optJSONArray("activities");
+                                if (result != null) {
+                                    result = JsonHelper.sort(result);
+                                    BackendProxy.getInstance().mActivityManager.saveActivitiesOfCategory(categoryId, result);
+                                    if (result != null) {
+                                        refreshAdapter(result);
+                                    }
+                                }
+                            }
                         }
 
                     }
@@ -161,6 +182,15 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
 //        mAdapter.mDataSource = array;
     }
 
+    private void refreshAdapter(JSONArray result) {
+        mAdapter.mDataSource = result;
+        runOnUiThread(() -> {
+            mAdapter.notifyDataSetChanged();
+            mLoader.hideLoader();
+
+        });
+    }
+
     private void layoutViews() {
         int logoSize = dpToPx(100);
         int headerSize = logoSize / 2 + dpToPx(16);
@@ -168,9 +198,14 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
 
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        params.topMargin = getHeadSize();
+        params.topMargin = getHeadSize()+margin;
+        params.bottomMargin = Tools.getBottomNavHeightWithMargin() + margin;
         mAvtivitiesList.setLayoutParams(params);
 
+
+        params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        mLoader.setLayoutParams(params);
     }
 
     @Override
@@ -189,9 +224,9 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
                                         hideLockedLoading();
                                         hidePopup();
                                         if (response != null) {
+                                            removeCurrentCategoryActivities();
                                             fillActivities();
                                             mAdapter.notifyDataSetChanged();
-
                                         } else {
                                             showSimplePopup(getString(R.string.server_error));
                                         }
@@ -225,6 +260,7 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
                                 hideLockedLoading();
                                 mAdapter.mDataSource.remove(position);
                                 mAdapter.notifyDataSetChanged();
+                                removeCurrentCategoryActivities();
                             });
                         }
                     });
@@ -239,6 +275,12 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
             }
         });
 
+    }
+
+    private void removeCurrentCategoryActivities() {
+        if (!StringHelper.isNullOrEmpty(mCurrentCategoryId)) {
+            BackendProxy.getInstance().mActivityManager.removeActivityOfCategory(mCurrentCategoryId);
+        }
     }
 
 
@@ -366,7 +408,8 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
             mDescription.setLayoutParams(params);
 
             params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.topMargin = margin;
+            params.bottomMargin = margin/2;
+            params.topMargin = margin/2;
             params.setMarginEnd(margin);
             params.setMarginStart(margin);
             setLayoutParams(params);
@@ -391,11 +434,14 @@ public class ActivitiesView extends HeadView implements DidOnTap, OnCellSwipe {
     @Override
     public void onHeadBtnClicked(HeadComponents view1) {
         super.onHeadBtnClicked(view1);
-        AddPopup addActivityPopup = new AddPopup(getContext());
-        addActivityPopup.mNameEditText.setPlaceHolder(getString(R.string.add_new_activity));
-        addActivityPopup.mDelegate = this;
-        addActivityPopup.setOnTapListener(this);
+        int index = view1.mIndex;
+        if (index == ACTION_BTN) {
+            AddPopup addActivityPopup = new AddPopup(getContext());
+            addActivityPopup.mNameEditText.setPlaceHolder(getString(R.string.add_new_activity));
+            addActivityPopup.mDelegate = this;
+            addActivityPopup.setOnTapListener(this);
 
-        showPopup(addActivityPopup);
+            showPopup(addActivityPopup);
+        }
     }
 }

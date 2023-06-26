@@ -1,10 +1,10 @@
-package com.example.scoutchallenge.views;
+package com.example.scoutchallenge.views.moufawad_views;
 
 import android.content.Context;
 import android.view.View;
 
-import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.models.MemberModule;
+import com.example.scoutchallenge.views.HomeView;
 
 public class MoufawadHomeView extends HomeView {
 

@@ -61,7 +61,7 @@ public class HeadComponents extends FrameLayout {
 
 
     public int getImage(String key) {
-        return D.getResourceId(key);
+        return Tools.getImage(key);
     }
 
 

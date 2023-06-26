@@ -5,7 +5,6 @@ import static android.view.View.GONE;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -33,6 +32,7 @@ import androidx.navigation.Navigation;
 import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.conponents.HeadComponents;
 import com.example.scoutchallenge.conponents.MImageComponent;
+import com.example.scoutchallenge.conponents.popups.SettingsPopup;
 import com.example.scoutchallenge.helpers.AnimationHelper;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.Tools;
@@ -44,7 +44,7 @@ import org.json.JSONObject;
 public class HeadView extends Fragment {
     public static final int HEADER_LOG = 0;
     public static final int ACTION_BTN = 1;
-    public static final int PROFILE_BTN = 1;
+    public static final int PROFILE_BTN = 2;
 
     public NavController mNavController;
     protected Context mSelf;
@@ -133,6 +133,12 @@ public class HeadView extends Fragment {
     }
 
     public void onHeadBtnClicked(HeadComponents view1) {
+        int index = view1.mIndex;
+        if (index == PROFILE_BTN) {
+            SettingsPopup settingsPopup = new SettingsPopup(getContext());
+
+            showPopup(settingsPopup);
+        }
     }
 
     @Override
@@ -379,6 +385,9 @@ public class HeadView extends Fragment {
         return Tools.getBottomNavHeight();
     }
 
+    public static int getBottomNavHeightWithMargin() {
+        return Tools.getBottomNavHeightWithMargin();
+    }
     public void showHeader() {
         mHeader.setVisibility(View.VISIBLE);
         mActionBtn.show();
@@ -436,6 +445,8 @@ public class HeadView extends Fragment {
                 menu.inflateMenu(R.menu.helping_leader_bottom_menu);
             } else if (position.equalsIgnoreCase(MemberModule.MOUFAWAD)) {
                 menu.inflateMenu(R.menu.moufwad_menu);
+            } else if (position.equalsIgnoreCase(MemberModule.ONSOR)) {
+                menu.inflateMenu(R.menu.user_bottom_meni);
 
             } else {
                 menu.inflateMenu(R.menu.leader_bottom_menu);

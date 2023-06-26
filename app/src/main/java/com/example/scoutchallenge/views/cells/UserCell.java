@@ -13,19 +13,17 @@ import com.example.scoutchallenge.conponents.CircularImageView;
 import com.example.scoutchallenge.conponents.HeadComponents;
 import com.example.scoutchallenge.conponents.MImageComponent;
 import com.example.scoutchallenge.conponents.MTextView;
-import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
-import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.DidOnTap;
 import com.example.scoutchallenge.interfaces.OnObjectCallBack;
-import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.network.MImageLoader;
 
 import org.json.JSONObject;
 
 public class UserCell extends HeadComponents {
 
-    public UserModule userModule = new UserModule();
+    public MemberModule userModule = new MemberModule();
     protected CircularImageView mImage;
     protected MTextView mNameLabel;
     protected MTextView mUserInfo;
@@ -81,11 +79,11 @@ public class UserCell extends HeadComponents {
 
         mLine = new HeadComponents(ctx);
         mLine.setBackgroundColor(getColor(R.color.headColor));
-        addView(mLine);
+//        addView(mLine);
 
-        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.white, -1, -1, -1);
-        gradientDrawable.setStroke(3, getColor(R.color.secondColor));
-        setBackground(gradientDrawable);
+//        GradientDrawable gradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.white, -1, -1, -1);
+//        gradientDrawable.setStroke(3, getColor(R.color.secondColor));
+//        setBackground(gradientDrawable);
 
         setElevation(2);
         layoutViews();
@@ -149,7 +147,7 @@ public class UserCell extends HeadComponents {
                 userModule.setData(user);
                 mNameLabel.setText(userModule.getmName());
                 MImageLoader.loadWithGlide(userModule.getImageUrl(), 0, mImage.getImage());
-                mUserInfo.setText(userModule.getTaliaaName() + "." + userModule.getmDateOfBirth() + "." + userModule.getmAddress());
+                mUserInfo.setText(userModule.getTaliaaName());
             }
             if (isKoraanCell) {
                 mIcon.show();

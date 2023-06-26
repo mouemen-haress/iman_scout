@@ -16,7 +16,9 @@ import com.example.scoutchallenge.conponents.MCircularImage;
 import com.example.scoutchallenge.conponents.MImageComponent;
 import com.example.scoutchallenge.conponents.MTextView;
 import com.example.scoutchallenge.helpers.D;
+import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.DidOnTap;
+import com.example.scoutchallenge.interfaces.OnSimplePopupDelegate;
 
 import org.json.JSONObject;
 
@@ -24,9 +26,11 @@ public class SimplePopup extends HeadComponents {
 
     LinearLayout mContainer;
     protected MTextView mDescription;
+    LinearLayout mButtonContainer;
     protected MButtonComponent mConfirmBtn;
+    protected MButtonComponent mCancelBtn;
 
-    public DidOnTap mDelegate;
+    public OnSimplePopupDelegate mDelegate;
 
 
     public SimplePopup(@NonNull Context context) {
@@ -43,19 +47,39 @@ public class SimplePopup extends HeadComponents {
 
 
         mDescription = new MTextView(ctx);
+        mDescription.getLabel().setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        mDescription.getLabel().setTextSize(14);
         mContainer.addView(mDescription);
 
+        mButtonContainer = new LinearLayout(ctx);
+        mButtonContainer.setOrientation(LinearLayout.HORIZONTAL);
+        mContainer.addView(mButtonContainer);
+
         mConfirmBtn = new MButtonComponent(ctx);
-        mConfirmBtn.setText(getString(R.string.ok));
+        mConfirmBtn.setText(getString(R.string.okk));
         mConfirmBtn.setOnTapListener(new DidOnTap() {
             @Override
             public void onTap(HeadComponents view) {
                 if (mDelegate != null) {
-                    mDelegate.onTap(view);
+                    mDelegate.onConfirm();
                 }
             }
         });
-        mContainer.addView(mConfirmBtn);
+        mButtonContainer.addView(mConfirmBtn);
+
+        mCancelBtn = new MButtonComponent(ctx);
+        mCancelBtn.setText(getString(R.string.no));
+        mCancelBtn.hide();
+        mCancelBtn.setOnTapListener(new DidOnTap() {
+            @Override
+            public void onTap(HeadComponents view) {
+                Tools.hidePopup();
+                if (mDelegate != null) {
+                    mDelegate.onCancel();
+                }
+            }
+        });
+        mButtonContainer.addView(mCancelBtn);
 
         layoutViews();
     }
@@ -87,18 +111,29 @@ public class SimplePopup extends HeadComponents {
 
         LinearLayout.LayoutParams linearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         linearParams.gravity = Gravity.CENTER_HORIZONTAL;
-
         linearParams.topMargin = margin;
 
         mDescription.setLayoutParams(linearParams);
 
 
-        linearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, logoSize / 2);
+        linearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        linearParams.setMargins(margin, margin, margin, margin);
+        mButtonContainer.setLayoutParams(linearParams);
+
+        linearParams = new LinearLayout.LayoutParams(0, logoSize);
+        linearParams.weight = 2;
+        linearParams.setMarginEnd(margin);
         mConfirmBtn.setLayoutParams(linearParams);
+        mCancelBtn.setLayoutParams(linearParams);
+
 
         params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setLayoutParams(params);
 
+    }
+
+    public void showCancelButton() {
+        mCancelBtn.show();
     }
 
 

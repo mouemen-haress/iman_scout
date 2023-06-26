@@ -36,10 +36,12 @@ public class DatePickerComponent extends HeadComponents {
 
         mText = new MTextView(ctx);
         mText.setTextColor(getColor(R.color.white));
+        mText.getLabel().setTextAlignment(TEXT_ALIGNMENT_CENTER);
         addView(mText);
 
         mIcon = new MImageComponent(ctx);
-        addView(mIcon);
+        mIcon.hide();
+//        addView(mIcon);
         myGradientDrawable = getDrawable(GradientDrawable.RECTANGLE, R.color.secondColor, dpToPx(10), 2,
                 -1);
 
@@ -69,15 +71,18 @@ public class DatePickerComponent extends HeadComponents {
 
         int margin = dpToPx(16);
 
-        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
-        params.setMarginEnd(iconSize);
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        params.setMarginEnd(margin);
         params.setMarginStart(margin);
         mText.setLayoutParams(params);
 
         params = new LayoutParams(iconSize, iconSize);
         params.gravity = Gravity.END;
         mIcon.setLayoutParams(params);
+
+        params = new LayoutParams(iconSize, iconSize);
+        setLayoutParams(params);
 
     }
 

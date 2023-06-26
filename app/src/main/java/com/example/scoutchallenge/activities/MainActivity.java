@@ -8,6 +8,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 
 import com.example.scoutchallenge.App;
@@ -25,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
+    
 
     protected BottomNavigationView mBottomNav;
     protected NavHostFragment mNavHostFragment;
@@ -153,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         if (mNavHostFragment == null) {
             mNavHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         }
+
         return mNavHostFragment;
     }
 

@@ -6,7 +6,7 @@ import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.helpers.StringHelper;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
-import com.example.scoutchallenge.models.UserModule;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.network.ApiClient;
 import com.example.scoutchallenge.utils.LocalStorage;
 
@@ -27,7 +27,7 @@ public class UserManager {
     }
 
 
-    public void addUser(UserModule model, CallBack callBack) {
+    public void addUser(MemberModule model, CallBack callBack) {
 
         JSONObject body = new JSONObject();
         body = parseUserModel(model.getmName(), false, model);
@@ -47,7 +47,7 @@ public class UserManager {
         });
     }
 
-    public void addUserLocaly(UserModule userModel, CallBack callBack) {
+    public void addUserLocaly(MemberModule userModel, CallBack callBack) {
         JSONObject userObject = parseUserModel("", false, userModel);
         if (userObject != null) {
             mAllUserList.put(userObject);
@@ -57,7 +57,7 @@ public class UserManager {
     }
 
 
-    private JSONObject parseUserModel(String fakeText, boolean isFake, UserModule model) {
+    private JSONObject parseUserModel(String fakeText, boolean isFake, MemberModule model) {
         JSONObject body = new JSONObject();
         JsonHelper.put(body, "Name", fakeText);
         isFake = D.IS_STIMILATE_ADD_USER_ENABLED;
@@ -191,11 +191,27 @@ public class UserManager {
     }
 
 
-    public void updateUser(UserModule model, CallBack callBack) {
+    public void updateUser(MemberModule model, CallBack callBack) {
         JSONObject body = new JSONObject();
         body = parseUserModel(model.getmName(), false, model);
 
         ApiClient.getInstance().perFormeRequest(D.UPDATE_USER + "/" + model.getId(), body, new CallBack() {
+            @Override
+            public void onResult(String response) {
+                if (response != null) {
+                    callBack.onResult(response);
+                } else {
+                    callBack.onResult(null);
+                }
+
+            }
+        });
+    }
+
+    public void getLast30Activities(String categoryId, String userId, CallBack callBack) {
+        JSONObject body = new JSONObject();
+        JsonHelper.put(body, "userId", userId);
+        ApiClient.getInstance().perFormeRequest(D.GET_ONSOR_ACTIVITIES + "/" + categoryId, body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -263,7 +279,7 @@ public class UserManager {
         return mUserMap.get(id);
     }
 
-    public UserModule getUserBySerialNumber(String searchedSerial) {
+    public MemberModule getUserBySerialNumber(String searchedSerial) {
         if (StringHelper.isNullOrEmpty(searchedSerial)) {
             return null;
         }
@@ -271,7 +287,7 @@ public class UserManager {
             for (int i = 0; i < mAllUserList.length(); i++) {
                 JSONObject currentUser = mAllUserList.optJSONObject(i);
                 if (currentUser != null) {
-                    UserModule userModule = new UserModule();
+                    MemberModule userModule = new MemberModule();
                     userModule.setData(currentUser);
                     if (searchedSerial.equalsIgnoreCase(userModule.getmSerialNumber())) {
                         return userModule;
@@ -317,4 +333,6 @@ public class UserManager {
 
         return resultArray;
     }
+
+
 }

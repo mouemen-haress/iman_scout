@@ -5,8 +5,8 @@ import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
+import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.models.TaliaaModel;
-import com.example.scoutchallenge.models.UserModule;
 import com.example.scoutchallenge.network.ApiClient;
 import com.example.scoutchallenge.utils.LocalStorage;
 import com.example.scoutchallenge.utils.NotificationCenter;
@@ -219,7 +219,7 @@ public class TaliaaManager {
             for (int i = 0; i < users.length(); i++) {
                 JSONObject currentUSer = users.optJSONObject(i);
                 if (currentUSer != null) {
-                    UserModule userModule = new UserModule();
+                    MemberModule userModule = new MemberModule();
                     userModule.setData(currentUSer);
                     userModule.setTaliaaId(otherTaliaaModel.get_id());
                     userModule.setTaliaaName(otherTaliaaModel.getName());

@@ -72,4 +72,8 @@ public class MTextView extends HeadComponents {
         mLabel.setSingleLine(false);
         mLabel.setLines(lineNb);
     }
+
+    public void setTypeFace(int type) {
+        mLabel.setTypeface(mLabel.getTypeface(), type);
+    }
 }
