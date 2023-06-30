@@ -245,7 +245,7 @@ public class MatrixColumComponent extends HeadComponents {
                 MemberModule userModule = new MemberModule();
                 userModule.setData(data);
 
-                String name = data.optString("Name");
+                String name = data.optString("name");
                 mNameLabel.setText(name);
 
                 MImageLoader.loadWithGlide(userModule.getImageUrl(), 0, mImage.getImage());

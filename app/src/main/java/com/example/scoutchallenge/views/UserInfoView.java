@@ -51,16 +51,7 @@ public class UserInfoView extends AddUserView {
             @Override
             public void onResult(String response) {
                 if (response != null) {
-                    App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
-                        @Override
-                        public void onResult(String response) {
-                            runOnUiThread(() -> {
-                                hideLockedLoading();
-                                showToast(getString(R.string.user_updated_success));
-                                popBackStack();
-                            });
-                        }
-                    });
+
                 } else {
                     showSimplePopup(getString(R.string.server_error));
                 }
@@ -101,7 +92,6 @@ public class UserInfoView extends AddUserView {
         mName.setText(mUserModule.getmName());
         MImageLoader.loadWithGlide(mUserModule.getImageUrl(), 0, mProfile.getImage());
 
-        mEmail.setText(mUserModule.getmEmail());
         mEmail.removeCondition(MDrawableEditText.DEFAULT);
 
         mDate.setHint(mUserModule.getmDateOfBirth());
@@ -109,16 +99,15 @@ public class UserInfoView extends AddUserView {
         mBloodType.setText(mUserModule.getmPersonalBloodType());
         mClothesSwitch.setChecked(mUserModule.ismHasClothes());
         fillTaliaaList();
-        mNumber.setText(mUserModule.getmRegisterNumber());
+        mNumber.setText(mUserModule.getmOwnNuymber());
         mPassword.setText(mUserModule.getmPassword());
 
         mFatherName.setText(mUserModule.getmFatherName());
-        mFatherBloodType.setText(mUserModule.getMfhaterBloodType());
+
         mFatherNumber.setText(mUserModule.getmFhaterPhone());
         mFatherWork.setText(mUserModule.getmFatherWork());
 
         mMotherName.setText(mUserModule.getmMotherName());
-        mMotherBloodType.setText(mUserModule.getmMotherBloodType());
         mMotherNumber.setText(mUserModule.getmMotherPhone());
         mMotherWork.setText(mUserModule.getmMotherWork());
 
@@ -169,11 +158,7 @@ public class UserInfoView extends AddUserView {
 
     @Override
     public void checkEmail(boolean hasFocus) {
-        if (mUserModule.getmEmail().equalsIgnoreCase(mEmail.getText())) {
 
-        } else {
-            super.checkEmail(hasFocus);
-        }
     }
 
     @Override
@@ -189,21 +174,5 @@ public class UserInfoView extends AddUserView {
         Boolean numberGo = mNumber.canGo();
         Boolean passwordPass = mPassword.canGo();
 
-        if (mUserModule.getmEmail().equalsIgnoreCase(mEmail.getText())) {
-            boolean canSelfPass = nameGo && dateGo && numberGo && passwordPass && !isImageEmpty();
-            if (callBack != null) {
-                if (canSelfPass) {
-                    callBack.onResult("");
-                } else {
-                    callBack.onResult(null);
-                }
-            }
-
-        } else {
-            if (!mPassword.canGo()) {
-                return;
-            }
-            super.canPassSelfInfoContainer(callBack);
-        }
     }
 }

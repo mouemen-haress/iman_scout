@@ -1,11 +1,19 @@
 package com.example.scoutchallenge.backend;
 
+import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MainManager {
     public void doCallBack(CallBack callBack, String data) {
+        if (callBack != null) {
+            callBack.onResult(data);
+        }
+    }
+
+    public void doCallBack(ArrayCallBack callBack, JSONArray data) {
         if (callBack != null) {
             callBack.onResult(data);
         }

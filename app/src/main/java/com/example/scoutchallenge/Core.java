@@ -1,5 +1,6 @@
 package com.example.scoutchallenge;
 
+import com.example.scoutchallenge.helpers.StringHelper;
 import com.example.scoutchallenge.models.MemberModule;
 import com.example.scoutchallenge.utils.LocalStorage;
 
@@ -61,5 +62,10 @@ public class Core {
             return mMemberModule;
         }
         return new MemberModule();
+    }
+
+    public String getFerkaId() {
+        String id = getCurrentMemberModel().getFerkaId();
+        return !StringHelper.isNullOrEmpty(id) ? id : "";
     }
 }

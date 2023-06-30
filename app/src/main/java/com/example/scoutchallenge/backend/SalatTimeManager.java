@@ -9,7 +9,7 @@ public class SalatTimeManager {
 
     public void getSlatTime(CallBack callBack) {
 
-        ApiClient.getInstance().perFormeRequest(D.SALAT_ROOT, null, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.SALAT_ROOT", null, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {

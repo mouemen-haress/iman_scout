@@ -122,7 +122,7 @@ public class SelectUserPopup extends HeadComponents {
                 if (StringHelper.isNullOrEmpty(text)) {
                     setDataArray(mUserArray);
                 } else {
-                    setDataArray(getSpesificUser(text));
+
                 }
             }
 
@@ -303,9 +303,6 @@ public class SelectUserPopup extends HeadComponents {
         }
     }
 
-    private JSONArray getSpesificUser(String text) {
-        return BackendProxy.getInstance().mUserManager.getRelatedNameUser(text, mUserArray);
-    }
 
 
     private void fixHintGarvity() {

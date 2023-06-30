@@ -178,7 +178,6 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
             if (userList != null) {
                 mCurrentUserList = userList;
                 mAdapter.mDataSource = userList;
-                mOtherUserList = BackendProxy.getInstance().mUserManager.getOtherUser(mCurrentUserList);
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -327,15 +326,6 @@ public class ActivityUserListView extends HeadView implements DidOnTap, OnCellSw
 
                                     }
                                     if (response != null) {
-                                        JSONArray lastUserArray = mRelatedObj.optJSONArray("users");
-                                        JSONObject targetUser = BackendProxy.getInstance().mUserManager.getUserById(cuurentId);
-                                        if (targetUser != null) {
-                                            JSONObject userIdObj = new JSONObject();
-                                            JsonHelper.put(userIdObj, "userId", targetUser);
-                                            lastUserArray.put(userIdObj);
-                                        }
-                                        fillUsers();
-
 
                                     }
                                 });

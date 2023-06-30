@@ -85,30 +85,6 @@ public class UserListComponent extends HeadComponents implements DidOnTap {
             mAdapter.notifyDataSetChanged();
         }
 
-
-//        JSONArray array = new JSONArray();
-//
-//        JSONObject obj = new JSONObject();
-//        JsonHelper.put(obj, "date", "22/2/2022");
-//        JsonHelper.put(obj, "description", "لقاء العقدة 6 ");
-//        array.put(obj);
-//
-//        obj = new JSONObject();
-//        JsonHelper.put(obj, "date", "22/2/2022");
-//        JsonHelper.put(obj, "description", "لقاء العقدة 6 ");
-//        array.put(obj);
-//
-//        obj = new JSONObject();
-//        JsonHelper.put(obj, "date", "22/2/2022");
-//        JsonHelper.put(obj, "description", "لقاء العقدة 6 ");
-//        array.put(obj);
-//
-//        obj = new JSONObject();
-//        JsonHelper.put(obj, "date", "22/2/2022");
-//        JsonHelper.put(obj, "description", "لقاء العقدة 6 ");
-//        array.put(obj);
-//
-//        mAdapter.mDataSource = array;
     }
 
     private void layoutViews() {

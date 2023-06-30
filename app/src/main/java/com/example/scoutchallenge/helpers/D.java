@@ -2,8 +2,6 @@ package com.example.scoutchallenge.helpers;
 
 import com.example.scoutchallenge.R;
 
-import org.json.JSONObject;
-
 import java.util.HashMap;
 
 public class D {
@@ -17,28 +15,13 @@ public class D {
 //    public final static String ASSET_URL = "http://192.168.1.111:8080";
 
 
-    public final static String SALAT_ROOT = "/get-prayer";
-    public final static String GET_USER_SQUAD = "/get-user-squad";
+    public final static String GET_MY_AMASER = "/getMyAnaser";
     public final static String LOGIN_ROOT = "/login";
-    public final static String GET_SQUAD_CATEGORIES = "/get-squad-categories";
-    public final static String GET_SQUAD_ACTIVITIES = "/get-squad-activities";
-    public final static String ADD_ACTIVITIES = "/add-activities";
-    public final static String ADD_USER_TO_ACTIVITY = "/add-user-activities";
-    public final static String CHECK_EMAIL = "/check-Email";
-    public final static String ADD_USER = "/register";
-    public final static String DELET_USER_ACTIVITIES = "/delete-user-activities";
-    public final static String UPDATE_USER = "/update-user";
-    public final static String GET_ONSOR_ACTIVITIES = "/get-onsor-activities";
 
-    public final static String DELETE_ACTIVITIES = "/delete-activities";
-    public final static String DELETE_USER_TALIAA = "/delete-user-taliaa";
-    public final static String UPDATE_NOTE_ACTIVITIES = "/update-note-activities";
 
     //taliaa Api
-    public final static String GET_TALIAA = "/get-taliaa";
-    public final static String ADD_TALIAA = "/add-taliaa";
-    public final static String DELETE_TALIAA = "/delete-taliaa";
-    public final static String ADD_USER_TALIAA = "/add-user-taliaa";
+    public final static String GET_TALIAA = "/getMyAllTaliaa";
+
 
 
 

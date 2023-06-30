@@ -26,7 +26,7 @@ public class ActivityManager {
 
         JSONObject body = new JSONObject();
 
-        ApiClient.getInstance().perFormeRequest(D.GET_SQUAD_CATEGORIES + "/" + LocalStorage.getString(LocalStorage.SQUAD), body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.GET_SQUAD_CATEGORIES "+ "/" + LocalStorage.getString(LocalStorage.SQUAD), body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -71,7 +71,7 @@ public class ActivityManager {
 
         JSONObject body = new JSONObject();
 
-        ApiClient.getInstance().perFormeRequest(D.GET_SQUAD_ACTIVITIES + "/" + categoryId, body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.GET_SQUAD_ACTIVITIES" + "/" + categoryId, body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -90,7 +90,7 @@ public class ActivityManager {
         JsonHelper.put(body, "title", title);
         JsonHelper.put(body, "categoryId", categoryId);
 
-        ApiClient.getInstance().perFormeRequest(D.ADD_ACTIVITIES, body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.ADD_ACTIVITIES", body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -112,7 +112,7 @@ public class ActivityManager {
         JsonHelper.put(body, "next", "");
 
 
-        ApiClient.getInstance().perFormeRequest(D.ADD_USER_TO_ACTIVITY + "/" + activityId, body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.ADD_USER_TO_ACTIVITY "+ "/" + activityId, body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -126,7 +126,7 @@ public class ActivityManager {
     }
 
     public void detletActivity(String activityId, CallBack callBack) {
-        ApiClient.getInstance().perFormeRequest(D.DELETE_ACTIVITIES + "/" + activityId, null, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.DELETE_ACTIVITIES" + "/" + activityId, null, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -142,7 +142,7 @@ public class ActivityManager {
     public void deleteUserFromActivity(String userId, String activityId, CallBack callBack) {
         JSONObject body = new JSONObject();
         JsonHelper.put(body, "userId", userId);
-        ApiClient.getInstance().perFormeRequest(D.DELET_USER_ACTIVITIES + "/" + activityId, body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.DELET_USER_ACTIVITIES" + "/" + activityId, body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -164,7 +164,7 @@ public class ActivityManager {
         JsonHelper.put(body, "rate", rate);
         JsonHelper.put(body, "next", next);
 
-        ApiClient.getInstance().perFormeRequest(D.UPDATE_NOTE_ACTIVITIES + "/" + activityId, body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("D.UPDATE_NOTE_ACTIVITIES "+ "/" + activityId, body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {

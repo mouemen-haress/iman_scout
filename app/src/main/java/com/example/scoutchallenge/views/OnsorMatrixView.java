@@ -21,6 +21,9 @@ import com.example.scoutchallenge.conponents.components_Group.UserListComponent;
 import com.example.scoutchallenge.helpers.StringHelper;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class OnsorMatrixView extends HeadView {
     protected MDrawableEditText mSearch;
@@ -33,7 +36,7 @@ public class OnsorMatrixView extends HeadView {
     @Override
     public void init(Context ctx, View view) {
         super.init(ctx, view);
-
+        showTabBar(true);
         showHeader();
         setHeadBtn(getImage("add_icon"));
 
@@ -88,7 +91,20 @@ public class OnsorMatrixView extends HeadView {
     }
 
     private JSONArray getSpesificUser(String text) {
-        return BackendProxy.getInstance().mUserManager.getRelatedNameUser(text);
+        JSONArray users = BackendProxy.getInstance().mUserManager.mAllUserList;
+        JSONArray resultArray = new JSONArray();
+        if (users != null) {
+            for (int i = 0; i < users.length(); i++) {
+                JSONObject object = users.optJSONObject(i);
+                if (object != null) {
+                    String name = object.optString("name");
+                    if (name.contains(text)) {
+                        resultArray.put(object);
+                    }
+                }
+            }
+        }
+        return resultArray;
     }
 
     private void layoutViews() {
@@ -114,18 +130,18 @@ public class OnsorMatrixView extends HeadView {
         params.setMarginEnd(margin);
         params.setMarginStart(margin);
         params.topMargin = getHeadSize() + searchHeight + margin;
-        params.bottomMargin = getBottomNavHeightWithMargin()+margin;
+        params.bottomMargin = getBottomNavHeightWithMargin() + margin;
         mUserList.setLayoutParams(params);
 
     }
 
 
     private void fillData() {
-
-
-        JSONArray taliaaList = BackendProxy.getInstance().mTaliaaManager.mTaliaaList;
-        mAdapter.mDataSource = taliaaList;
-        mAdapter.notifyDataSetChanged();
+        JSONArray fullUsersArray = BackendProxy.getInstance().mUserManager.fullUserTaliaaArray;
+        if (fullUsersArray != null) {
+            mAdapter.mDataSource = fullUsersArray;
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
 

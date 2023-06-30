@@ -142,7 +142,6 @@ public class StatisticOnsorView extends HeadView implements DidOnTap, OnCellSwip
         };
 
         setHeadBtn(getImage("analysis"));
-        fillUserActivities();
         layoutViews();
     }
 
@@ -154,38 +153,6 @@ public class StatisticOnsorView extends HeadView implements DidOnTap, OnCellSwip
 
     }
 
-    protected void fillUserActivities() {
-        JSONObject data = mRelatedObj;
-        if (data != null) {
-            BackendProxy.getInstance().mUserManager.getLast30Activities(data.optString("_id"),
-                    LocalStorage.getString(LocalStorage.SELF_ID), response -> {
-                        runOnUiThread(() -> {
-                            if (response != null) {
-                                JSONObject responseObj = JsonHelper.parse(response);
-                                if (responseObj != null) {
-                                    JSONArray activitiesList = responseObj.optJSONArray("activities");
-                                    if (activitiesList != null) {
-                                        mActivitiesList = activitiesList;
-                                        activitiesList = JsonHelper.sort(activitiesList);
-                                        mAdapter.mDataSource = activitiesList;
-                                        runOnUiThread(() -> {
-                                            mAdapter.notifyDataSetChanged();
-                                        });
-                                    }
-                                }
-
-                            }
-                        });
-                    });
-
-
-            String title = data.optString("title");
-            String headerText = "";
-            headerText = headerText + title;
-            mHeaderText.setText(headerText);
-        }
-
-    }
 
     private void layoutViews() {
         int logoSize = dpToPx(100);

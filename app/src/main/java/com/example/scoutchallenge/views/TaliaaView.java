@@ -110,22 +110,7 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
                 @Override
                 public void onTap(HeadComponents view) {
                     showLockedLoading();
-                    String taliaaID = taliaa.optString("_id");
-                    String defaultTaliaaID = BackendProxy.getInstance().mTaliaaManager.getDefaultTaliaaId();
-                    if (!StringHelper.isNullOrEmpty(defaultTaliaaID)) {
-                        BackendProxy.getInstance().mTaliaaManager.deleteTaliaa(taliaaID, defaultTaliaaID, new CallBack() {
-                            @Override
-                            public void onResult(String response) {
-                                runOnUiThread(() -> {
-                                    hideLockedLoading();
-                                    if (mAdapter != null) {
-                                        BackendProxy.getInstance().mTaliaaManager.deleteTaliaaLocaly(taliaa);
-                                        fillDate();
-                                    }
-                                });
-                            }
-                        });
-                    }
+
                 }
             }, new DidOnTap() {
                 @Override
@@ -146,34 +131,7 @@ public class TaliaaView extends HeadView implements OnCellSwipe, DidOnTap {
                 MDrawableEditText mDrawableEditText = (MDrawableEditText) view;
                 showLockedLoading();
                 hidePopup();
-                BackendProxy.getInstance().mTaliaaManager.addTaliaa(mDrawableEditText.getText(), new CallBack() {
-                    @Override
-                    public void onResult(String response) {
-                        if (response != null) {
-                            App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
-                                @Override
-                                public void onResult(String response) {
-                                    runOnUiThread(() -> {
-                                        hideLockedLoading();
-                                        if (response != null) {
-                                            fillDate();
-                                        } else {
-                                            showSimplePopup(getString(R.string.server_error));
-                                        }
-                                    });
-                                }
-                            });
 
-
-                        } else {
-                            runOnUiThread(() -> {
-                                hideLockedLoading();
-                                showSimplePopup(getString(R.string.server_error));
-                            });
-
-                        }
-                    }
-                });
 
                 break;
             default:

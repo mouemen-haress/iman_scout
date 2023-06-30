@@ -44,7 +44,6 @@ public class TaliaaUserListView extends ActivityUserListView {
             if (userList != null) {
                 mCurrentUserList = userList;
                 mAdapter.mDataSource = userList;
-                mOtherUserList = BackendProxy.getInstance().mUserManager.getOtherUser(mCurrentUserList);
                 mAdapter.notifyDataSetChanged();
 
             }
@@ -77,49 +76,7 @@ public class TaliaaUserListView extends ActivityUserListView {
                     userModule.setData(user);
                     String id = userModule.getId();
                     showLockedLoading();
-                    BackendProxy.getInstance().mUserManager.deleteUserFromTaliaa(id, new CallBack() {
-                        @Override
-                        public void onResult(String response) {
-                            if (response != null) {
-                                runOnUiThread(() -> {
-                                    JSONArray lastUserArray = mRelatedObj.optJSONArray("users");
-                                    int removedIndex = -1;
-                                    for (int i = 0; i < lastUserArray.length(); i++) {
-                                        JSONObject currentUser = lastUserArray.optJSONObject(i);
-                                        if (currentUser != null) {
-                                            MemberModule userModule1 = new MemberModule();
-                                            userModule1.setData(currentUser);
-                                            String userId = userModule1.getId();
-                                            if (userId.equalsIgnoreCase(id)) {
-                                                removedIndex = i;
-                                                break;
-                                            }
-                                        }
 
-                                    }
-                                    if (removedIndex >= 0) {
-                                        lastUserArray.remove(removedIndex);
-                                        mAdapter.notifyDataSetChanged();
-
-                                        App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
-                                            @Override
-                                            public void onResult(String response) {
-                                                hideLockedLoading();
-
-                                            }
-                                        });
-
-                                    } else {
-                                        hideLockedLoading();
-                                    }
-                                });
-                            } else {
-                                hideLockedLoading();
-                                showSimplePopup(getString(R.string.server_error));
-
-                            }
-                        }
-                    });
 
                 }
             }
@@ -151,38 +108,7 @@ public class TaliaaUserListView extends ActivityUserListView {
                         int finalI = i;
                         hidePopup();
 
-                        BackendProxy.getInstance().mTaliaaManager.addUserToTaliaa(cuurentId, taliaaId, new CallBack() {
-                            @Override
-                            public void onResult(String response) {
-                                runOnUiThread(() -> {
 
-                                    if (response != null) {
-                                        JSONArray lastUserArray = mRelatedObj.optJSONArray("users");
-                                        JSONObject targetUser = BackendProxy.getInstance().mUserManager.getUserById(cuurentId);
-                                        if (targetUser != null) {
-                                            MemberModule targetUserModule = new MemberModule();
-                                            targetUserModule.setData(targetUser);
-                                            targetUserModule.setTaliaaId(taliaaId);
-
-                                            lastUserArray.put(targetUser);
-                                        }
-                                        runOnUiThread(() -> {
-                                            fillUsers();
-                                        });
-                                        if (finalI == arrayLenght - 1) {
-                                            App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
-                                                @Override
-                                                public void onResult(String response) {
-                                                    hideLockedLoading();
-                                                }
-                                            });
-                                        }
-
-                                    }
-                                });
-
-                            }
-                        });
                     }
 
                 }
@@ -191,13 +117,7 @@ public class TaliaaUserListView extends ActivityUserListView {
     }
 
     private void updateRelatedObject() {
-        if (mRelatedObj != null) {
-            String id = mRelatedObj.optString("_id");
-            JSONObject tempObject = BackendProxy.getInstance().mTaliaaManager.getTaliaaById(id);
-            if (tempObject != null) {
-                mRelatedObj = tempObject;
-            }
-        }
+
     }
 
 

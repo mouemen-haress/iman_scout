@@ -8,16 +8,18 @@ import android.view.View;
 import com.example.scoutchallenge.App;
 import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.R;
+import com.example.scoutchallenge.backend.BackendProxy;
 import com.example.scoutchallenge.helpers.Tools;
+import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
+import com.example.scoutchallenge.interfaces.OnSimplePopupDelegate;
 import com.example.scoutchallenge.models.MemberModule;
+
+import org.json.JSONArray;
 
 
 public class BootView extends HeadView {
 
-
-    private String mParam1;
-    private String mParam2;
 
     public BootView() {
         // Required empty public constructor
@@ -63,42 +65,47 @@ public class BootView extends HeadView {
     }
 
     private void fetchOnsorData() {
-        App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
-            @Override
-            public void onResult(String response) {
-                if (response != null) {
-                    pushAndSetRootView(R.id.bootView, R.id.onsorHomeView);
-                } else {
-                    Tools.showSimplePopup(getString(R.string.server_error));
-                }
-            }
-        });
+
     }
 
     private void fetchHelpingLeaderData() {
 
-        App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
+    }
+
+    private void fetchLeaderData() {
+        BackendProxy.getInstance().mTaliaaManager.getAllTaliaaOfFerka(new ArrayCallBack() {
             @Override
-            public void onResult(String response) {
-                if (response != null) {
-                    pushAndSetRootView(R.id.bootView, R.id.homeView);
+            public void onResult(JSONArray array) {
+                if (array != null) {
+                    BackendProxy.getInstance().mUserManager.getAllUser(new ArrayCallBack() {
+                        @Override
+                        public void onResult(JSONArray array) {
+                            if (array != null) {
+                                pushAndSetRootView(R.id.bootView, R.id.onsor_matrix_view);
+                            } else {
+                                showFaildFetchingPopup();
+                            }
+
+                        }
+                    });
                 } else {
-                    Tools.showSimplePopup(getString(R.string.server_error));
+                    showFaildFetchingPopup();
                 }
             }
         });
 
     }
 
-    private void fetchLeaderData() {
-        App.getSharedInstance().getMainActivity().injectTaliaaUSerData(new CallBack() {
+    private void showFaildFetchingPopup() {
+        showSimplePopup(getString(R.string.server_error), new OnSimplePopupDelegate() {
             @Override
-            public void onResult(String response) {
-                if (response != null) {
-                    pushAndSetRootView(R.id.bootView, R.id.homeView);
-                } else {
-                    Tools.showSimplePopup(getString(R.string.server_error));
-                }
+            public void onConfirm() {
+                Tools.doLogout();
+            }
+
+            @Override
+            public void onCancel() {
+
             }
         });
     }

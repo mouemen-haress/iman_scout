@@ -399,23 +399,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
     public void checkEmail(boolean hasFocus) {
         if (!hasFocus) {
-            BackendProxy.getInstance().mUserManager.checkUserEmail(mEmail.getText().trim(), new CallBack() {
-                @Override
-                public void onResult(String response) {
-                    if (response != null) {
-                        mEmail.removeCondition(MDrawableEditText.DEFAULT);
-                    } else {
-                        mEmail.addCondition(MDrawableEditText.DEFAULT);
-                    }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mEmail.canGo();
 
-                        }
-                    });
-                }
-            });
         } else {
         }
     }
@@ -471,7 +455,6 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
                                     if (array != null) {
                                         runOnUiThread(() -> {
                                             hideLockedLoading();
-                                            App.getSharedInstance().getMainActivity().injectTaliaaUSerDataLocaly(null);
                                             popBackStack();
 
                                         });
@@ -491,9 +474,8 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
     public void fillUserModel() {
         mUserModule.setName(mName.getText().trim());
-        mUserModule.setmEmail(mEmail.getText().trim());
         mUserModule.setmDateOfBirth(mDate.getText());
-        mUserModule.setmRegisterNumber(mNumber.getText().trim());
+        mUserModule.setmOwnNuymber(mNumber.getText().trim());
         mUserModule.setmPersonalBloodType(mBloodType.getText().trim());
         mUserModule.setmHasClothes(mClothesSwitch.isChecked());
         if (mSelectedTaliaaPosition != -1) {
@@ -505,11 +487,9 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
 
         }
         mUserModule.setmFerkaName(mFatherName.getText().trim());
-        mUserModule.setMfhaterBloodType(mFatherBloodType.getText().trim());
         mUserModule.setmFhaterPhone(mFatherNumber.getText().trim());
         mUserModule.setmFatherWork(mFatherWork.getText().trim());
         mUserModule.setmMotherName(mMotherName.getText().trim());
-        mUserModule.setmMotherBloodType(mMotherBloodType.getText().trim());
         mUserModule.setmMotherPhone(mMotherNumber.getText().trim());
         mUserModule.setmMotherWork(mMotherWork.getText().trim());
         mUserModule.setmPlaceOfBirth(mPlaceOfBirth.getText().trim());
@@ -748,31 +728,7 @@ public class AddUserView extends HeadView implements CategoriesMenuDelegate, Act
             Toast.makeText(getActivity(), getString(R.string.image_require), Toast.LENGTH_LONG).show();
         }
 
-        BackendProxy.getInstance().mUserManager.checkUserEmail(mEmail.getText().trim(), new CallBack() {
-            @Override
-            public void onResult(String response) {
-                if (response != null) {
-                    mEmail.removeCondition(MDrawableEditText.DEFAULT);
-                } else {
-                    mEmail.addCondition(MDrawableEditText.DEFAULT);
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Boolean emailGo = mEmail.canGo();
-                        boolean canSelfPass = nameGo && dateGo && numberGo && emailGo && !isImageEmpty();
-                        if (callBack != null) {
-                            if (canSelfPass) {
-                                callBack.onResult("");
-                            } else {
-                                callBack.onResult(null);
-                            }
-                        }
 
-                    }
-                });
-            }
-        });
     }
 
     public boolean canPassFatherContainer() {

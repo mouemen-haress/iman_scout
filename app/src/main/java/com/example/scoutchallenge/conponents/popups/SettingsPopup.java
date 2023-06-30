@@ -104,7 +104,7 @@ public class SettingsPopup extends HeadComponents {
         mLogoutButton = new MButtonComponent(ctx);
         mLogoutButton.setText(getText(R.string.log_out));
         mLogoutButton.setOnTapListener(view -> {
-            doLogout();
+            Tools.doLogout();
         });
         mContainer.addView(mLogoutButton);
 
@@ -112,12 +112,6 @@ public class SettingsPopup extends HeadComponents {
         layoutViews();
     }
 
-    private void doLogout() {
-        LocalStorage.clearAllLocalStorage();
-        Intent intent = App.getSharedInstance().mMyActivity.getIntent();
-        App.getSharedInstance().mMyActivity.finish();
-        App.getSharedInstance().mMyActivity.startActivity(intent);
-    }
 
     private void layoutViews() {
         int margin = dpToPx(16);

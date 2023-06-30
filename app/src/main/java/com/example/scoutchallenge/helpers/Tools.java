@@ -4,6 +4,7 @@ import static java.security.AccessController.getContext;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -32,11 +33,14 @@ import com.example.scoutchallenge.R;
 import com.example.scoutchallenge.activities.MainActivity;
 import com.example.scoutchallenge.conponents.HeadComponents;
 import com.example.scoutchallenge.conponents.popups.SimplePopup;
+import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.interfaces.DidOnTap;
 import com.example.scoutchallenge.interfaces.OnSimplePopupDelegate;
+import com.example.scoutchallenge.utils.LocalStorage;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Tools {
     static BottomSheetDialog mDialog;
@@ -167,6 +171,7 @@ public class Tools {
         view.setBackgroundColor(getColor(R.color.headColor));
         return view;
     }
+
     public static int getImage(String key) {
         return D.getResourceId(key);
     }
@@ -207,6 +212,10 @@ public class Tools {
     }
 
     public static void showSimplePopup(String des) {
+        showSimplePopup(des, null);
+    }
+
+    public static void showSimplePopup(String des, OnSimplePopupDelegate delegate) {
         runOnUIThread(() -> {
 
             SimplePopup simplePopup = new SimplePopup(App.getSharedInstance().mMyActivity);
@@ -215,11 +224,17 @@ public class Tools {
             simplePopup.mDelegate = new OnSimplePopupDelegate() {
                 @Override
                 public void onConfirm() {
+                    if (delegate != null) {
+                        delegate.onConfirm();
+                    }
                     hidePopup();
                 }
 
                 @Override
                 public void onCancel() {
+                    if (delegate != null) {
+                        delegate.onCancel();
+                    }
                     hidePopup();
 
                 }
@@ -281,4 +296,26 @@ public class Tools {
         }
 
     }
+
+    public static boolean isSuccess(JSONObject data) {
+        if (data != null) {
+            return data.optBoolean("success");
+        }
+        return false;
+    }
+
+    public static JSONObject getParsedResp(String data) {
+        if (data != null) {
+            return JsonHelper.parse(data);
+        }
+        return null;
+    }
+
+    public static void doLogout() {
+        LocalStorage.clearAllLocalStorage();
+        Intent intent = App.getSharedInstance().mMyActivity.getIntent();
+        App.getSharedInstance().mMyActivity.finish();
+        App.getSharedInstance().mMyActivity.startActivity(intent);
+    }
+
 }

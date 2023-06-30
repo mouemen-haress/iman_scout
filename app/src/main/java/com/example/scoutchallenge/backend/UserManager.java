@@ -1,9 +1,9 @@
 package com.example.scoutchallenge.backend;
 
-import com.example.scoutchallenge.App;
+import com.example.scoutchallenge.Core;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.JsonHelper;
-import com.example.scoutchallenge.helpers.StringHelper;
+import com.example.scoutchallenge.helpers.Tools;
 import com.example.scoutchallenge.interfaces.ArrayCallBack;
 import com.example.scoutchallenge.interfaces.CallBack;
 import com.example.scoutchallenge.models.MemberModule;
@@ -13,15 +13,13 @@ import com.example.scoutchallenge.utils.LocalStorage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Set;
 
-public class UserManager {
+public class UserManager extends MainManager {
     public JSONArray mAllUserList;
-    private HashMap<String, JSONObject> mUserMap;
-
+    public HashMap<String, JSONArray> mUserMap;
+    public JSONArray fullUserTaliaaArray;
 
     public UserManager() {
     }
@@ -32,7 +30,7 @@ public class UserManager {
         JSONObject body = new JSONObject();
         body = parseUserModel(model.getmName(), false, model);
 
-        ApiClient.getInstance().perFormeMultiTypeRequest(model.getmImageUri(), D.ADD_USER, body, new CallBack() {
+        ApiClient.getInstance().perFormeMultiTypeRequest(model.getmImageUri(), "", body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (callBack != null) {
@@ -46,16 +44,6 @@ public class UserManager {
             }
         });
     }
-
-    public void addUserLocaly(MemberModule userModel, CallBack callBack) {
-        JSONObject userObject = parseUserModel("", false, userModel);
-        if (userObject != null) {
-            mAllUserList.put(userObject);
-            mUserMap.put(userModel.getId(), userObject);
-        }
-        App.getSharedInstance().getMainActivity().injectTaliaaUSerDataLocaly(null);
-    }
-
 
     private JSONObject parseUserModel(String fakeText, boolean isFake, MemberModule model) {
         JSONObject body = new JSONObject();
@@ -98,10 +86,9 @@ public class UserManager {
         if (!isFake) {
             body = new JSONObject();
             JsonHelper.put(body, "Name", model.getmName());
-            JsonHelper.put(body, "Email", model.getmEmail());
             JsonHelper.put(body, "Date", model.getmDateOfBirth());
             JsonHelper.put(body, "BloodType", model.getmPersonalBloodType());
-            JsonHelper.put(body, "Number", model.getmRegisterNumber());
+            JsonHelper.put(body, "Number", model.getmOwnNuymber());
             JsonHelper.put(body, "Password", model.getmPassword());
             JsonHelper.put(body, "Position", "onsor");
             JsonHelper.put(body, "Cloth", model.ismHasClothes());
@@ -110,11 +97,9 @@ public class UserManager {
             JsonHelper.put(body, "isAdmin", "false");
 
             JsonHelper.put(body, "FatherName", model.getmFhaterPhone());
-            JsonHelper.put(body, "FatherBloodType", model.getMfhaterBloodType());
             JsonHelper.put(body, "FatherNumber", model.getmFhaterPhone());
             JsonHelper.put(body, "FatherWork", model.getmFatherWork());
             JsonHelper.put(body, "MotherName", model.getmMotherName());
-            JsonHelper.put(body, "MotherBloodType", model.getmMotherBloodType());
             JsonHelper.put(body, "MotherNumber", model.getmMotherPhone());
             JsonHelper.put(body, "MotherWork", model.getmMotherWork());
             JsonHelper.put(body, "PlaceOfBirth", model.getmPlaceOfBirth());
@@ -137,25 +122,28 @@ public class UserManager {
 
     public void getAllUser(ArrayCallBack callBack) {
 
-        ApiClient.getInstance().perFormeRequest(D.GET_USER_SQUAD + "/" + LocalStorage.getString(LocalStorage.SQUAD), null, new CallBack() {
+        ApiClient.getInstance().perFormeRequest(D.GET_MY_AMASER + "/" + Core.getInstance().getFerkaId(), null, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
-                    JSONObject object = JsonHelper.parse(response);
-                    JSONArray userArray = object.optJSONArray("user");
-                    mAllUserList = userArray;
-                    createUserMap();
+                    JSONObject parsedData = Tools.getParsedResp(response);
+                    if (parsedData != null) {
+                        if (Tools.isSuccess(parsedData)) {
+                            JSONArray data = parsedData.optJSONArray("data");
+                            if (data != null) {
+                                mAllUserList = data;
+                                createUserMap();
+                                doCallBack(callBack, data);
+                                return;
+                            }
 
-                    if (callBack != null) {
-                        callBack.onResult(mAllUserList);
-                    }
-
-                } else {
-                    if (callBack != null) {
-                        callBack.onResult(null);
+                        } else {
+                            doCallBack(callBack, null);
+                        }
                     }
                 }
 
+                doCallBack(callBack, null);
             }
         });
     }
@@ -164,30 +152,45 @@ public class UserManager {
         if (mUserMap == null) {
             mUserMap = new HashMap<>();
         }
+
+
+
+
         if (mAllUserList != null) {
             for (int i = 0; i < mAllUserList.length(); i++) {
-                JSONObject currrentUSer = mAllUserList.optJSONObject(i);
-                if (currrentUSer != null) {
-                    mUserMap.put(currrentUSer.optString("_id"), currrentUSer);
+                JSONObject currentOnj = mAllUserList.optJSONObject(i);
+                if (currentOnj != null) {
+                    JSONObject currentTaliaa = currentOnj.optJSONObject("taliaa");
+                    if (currentTaliaa != null) {
+                        String id = currentTaliaa.optString("idTaliaa");
+                        id = BackendProxy.getInstance().mTaliaaManager.getTaliaaNameById(id);
+                        JSONArray currentOnsorsArray = mUserMap.get(id);
+                        if (currentOnsorsArray == null) {
+                            JSONArray array = new JSONArray();
+                            array.put(currentOnj);
+                            mUserMap.put(id, array);
+                        } else {
+                            currentOnsorsArray.put(currentOnj);
+                        }
+                    }
                 }
             }
+
+            if (fullUserTaliaaArray == null) {
+                fullUserTaliaaArray = new JSONArray();
+            }
+            for (String key : mUserMap.keySet()) {
+                JSONArray value = mUserMap.get(key);
+                JSONObject object = new JSONObject();
+                if (value != null) {
+                    JsonHelper.put(object, "name", key);
+                    JsonHelper.put(object, "users", value);
+                    fullUserTaliaaArray.put(object);
+                }
+
+            }
+
         }
-    }
-
-    public void checkUserEmail(String email, CallBack callBack) {
-        JSONObject body = new JSONObject();
-        JsonHelper.put(body, "Email", email);
-        ApiClient.getInstance().perFormeRequest(D.CHECK_EMAIL, body, new CallBack() {
-            @Override
-            public void onResult(String response) {
-                if (response != null) {
-                    callBack.onResult(response);
-                } else {
-                    callBack.onResult(null);
-                }
-
-            }
-        });
     }
 
 
@@ -195,7 +198,7 @@ public class UserManager {
         JSONObject body = new JSONObject();
         body = parseUserModel(model.getmName(), false, model);
 
-        ApiClient.getInstance().perFormeRequest(D.UPDATE_USER + "/" + model.getId(), body, new CallBack() {
+        ApiClient.getInstance().perFormeRequest("" + "/" + model.getId(), body, new CallBack() {
             @Override
             public void onResult(String response) {
                 if (response != null) {
@@ -206,132 +209,6 @@ public class UserManager {
 
             }
         });
-    }
-
-    public void getLast30Activities(String categoryId, String userId, CallBack callBack) {
-        JSONObject body = new JSONObject();
-        JsonHelper.put(body, "userId", userId);
-        ApiClient.getInstance().perFormeRequest(D.GET_ONSOR_ACTIVITIES + "/" + categoryId, body, new CallBack() {
-            @Override
-            public void onResult(String response) {
-                if (response != null) {
-                    callBack.onResult(response);
-                } else {
-                    callBack.onResult(null);
-                }
-
-            }
-        });
-    }
-
-
-    public JSONArray getRelatedNameUser(String text, JSONArray array) {
-
-        JSONArray resultObject = new JSONArray();
-        JSONArray inputArray = new JSONArray();
-        inputArray = mAllUserList;
-        if (array != null) {
-            inputArray = array;
-        }
-
-        if (inputArray != null) {
-            for (int i = 0; i < inputArray.length(); i++) {
-                JSONObject currentObj = inputArray.optJSONObject(i);
-                if (currentObj != null) {
-                    String currentName = currentObj.optString("Name");
-                    if (!StringHelper.isNullOrEmpty(currentName)) {
-                        if (currentName.contains(text)) {
-                            JsonHelper.put(resultObject, currentObj);
-                        }
-                    }
-                }
-            }
-        }
-        return resultObject;
-
-    }
-
-    public JSONArray getRelatedNameUser(String text) {
-        return getRelatedNameUser(text, null);
-
-    }
-
-    public void deleteUserFromTaliaa(String userId, CallBack callBack) {
-        ApiClient.getInstance().perFormeRequest(D.DELETE_USER_TALIAA + "/" + userId, null, new CallBack() {
-            @Override
-            public void onResult(String response) {
-                if (callBack != null) {
-                    if (response != null) {
-                        callBack.onResult(response);
-                    } else {
-                        callBack.onResult(null);
-                    }
-                }
-
-            }
-        });
-    }
-
-    public JSONObject getUserById(String id) {
-        if (mUserMap == null) {
-            return null;
-        }
-        return mUserMap.get(id);
-    }
-
-    public MemberModule getUserBySerialNumber(String searchedSerial) {
-        if (StringHelper.isNullOrEmpty(searchedSerial)) {
-            return null;
-        }
-        if (mAllUserList != null) {
-            for (int i = 0; i < mAllUserList.length(); i++) {
-                JSONObject currentUser = mAllUserList.optJSONObject(i);
-                if (currentUser != null) {
-                    MemberModule userModule = new MemberModule();
-                    userModule.setData(currentUser);
-                    if (searchedSerial.equalsIgnoreCase(userModule.getmSerialNumber())) {
-                        return userModule;
-                    }
-                }
-            }
-        }
-        return null;
-
-    }
-
-
-    public JSONArray getOtherUser(JSONArray cuurentUserList) {
-        if (cuurentUserList == null || mUserMap == null) {
-            return null;
-        }
-
-        ArrayList<String> cuurentUSerListKeys = new ArrayList<>();
-        JSONArray resultArray = new JSONArray();
-        Set<String> mapKeys = mUserMap.keySet();
-
-        for (int i = 0; i < cuurentUserList.length(); i++) {
-            JSONObject user = cuurentUserList.optJSONObject(i);
-            if (user != null) {
-                JSONObject userData = user.optJSONObject("userId");
-                if (userData == null) {
-                    userData = user;
-                }
-
-                if (userData != null) {
-                    String userId = userData.optString("_id");
-                    cuurentUSerListKeys.add(userId);
-                }
-
-            }
-        }
-
-        for (String key : mapKeys) {
-            if (!cuurentUSerListKeys.contains(key)) {
-                resultArray.put(mUserMap.get(key));
-            }
-        }
-
-        return resultArray;
     }
 
 

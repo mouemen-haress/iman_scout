@@ -39,16 +39,7 @@ public class ScanView extends HeadView {
             @Override
             public void onDecoded(@NonNull final Result result) {
                 runOnUiThread(() -> {
-                    String resultText = result.getText();
-                    if (!StringHelper.isNullOrEmpty(resultText)) {
-                        MemberModule userModel = new MemberModule();
-                        userModel = BackendProxy.getInstance().mUserManager.getUserBySerialNumber(resultText);
-                        if (userModel != null && userModel.getData() != null) {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("userObj", userModel.getData().toString());
-                            pushView(R.id.showUserInfoView, bundle);
-                        }
-                    }
+
                 });
             }
         });

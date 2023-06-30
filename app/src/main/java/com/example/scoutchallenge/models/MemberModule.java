@@ -23,9 +23,8 @@ public class MemberModule {
     protected String mId;
     protected String mName;
 
-    protected String mRegisterNumber;
+    protected String mOwnNuymber;
     protected String mPlaceOfBirth;
-    protected String mEmail;
     protected String mDateOfBirth;
     protected String mPersonalBloodType;
     protected String mPersonalphone;
@@ -36,13 +35,11 @@ public class MemberModule {
     protected String mFatherWork;
     protected String mFatherEmail;
     protected String mFhaterPhone;
-    protected String mfhaterBloodType;
 
     protected String mMotherName;
     protected String mMotherEmail;
     protected String mMotherWork;
     protected String mMotherPhone;
-    protected String mMotherBloodType;
 
     protected String mFamilyNb;
     protected String mAddress;
@@ -58,7 +55,7 @@ public class MemberModule {
     protected String mIsHasOtherAssociation;
 
     protected String mPassword;
-    protected String mPosition;
+    protected String mType;
 
     protected String mFawjeId;
     protected String mTaliaaId;
@@ -107,7 +104,7 @@ public class MemberModule {
     protected String mMoufawadyeName;
     protected JSONObject mTaliaa;
 
-    public String getmFerkaId() {
+    public String getFerkaId() {
         return mFerkaId;
     }
 
@@ -144,30 +141,28 @@ public class MemberModule {
     public void setData(JSONObject data) {
         this.mData = data;
         if (mData != null) {
-            mId = mData.optString("_id");
-            mPosition = mData.optString("Position");
-            mName = mData.optString("Name");
-            mEmail = mData.optString("Email");
-            mPassword = mData.optString("Password");
-            mDateOfBirth = mData.optString("Date");
-            mPersonalBloodType = mData.optString("BloodType");
-            mRegisterNumber = mData.optString("Number");
-            mFatherName = mData.optString("FatherName");
-            mfhaterBloodType = mData.optString("FatherBloodType");
-            mFatherWork = mData.optString("FatherWork");
-            mMotherName = mData.optString("MotherName");
-            mMotherBloodType = mData.optString("MotherBloodType");
-            mMotherWork = mData.optString("MotherWork");
-            mPlaceOfBirth = mData.optString("PlaceOfBirth");
-            mAddress = mData.optString("Address");
-            mFamilyNb = mData.optString("NbOfFamily");
-            mAddressType = mData.optString("AddressType");
-            mSchool = mData.optString("CurrentEducation");
-            mIsHasChronicDisease = mData.optString("Illness");
-            mHasClothes = mData.optBoolean("Cloth");
-            insurance = mData.optString("Insurance");
-            mImageUrl = mData.optString("file");
-            mSerialNumber = mData.optString("SerialNumber");
+            mId = mData.optString("idUser");
+            mType = mData.optString("type");
+            mName = mData.optString("name");
+            mPassword = mData.optString("password");
+            mDateOfBirth = mData.optString("dateBearth");
+            mPersonalBloodType = mData.optString("bloodType");
+            mOwnNuymber = mData.optString("ownNumber");
+            mFatherName = mData.optString("fatherName");
+            mFatherWork = mData.optString("fatherWork");
+            mMotherName = mData.optString("motherName");
+            mMotherWork = mData.optString("motherWork");
+            mPlaceOfBirth = mData.optString("placeOfBirth");
+            mAddress = mData.optString("address");
+            mFamilyNb = mData.optString("familtNb");
+            mAddressType = mData.optString("addressType");
+            mSchool = mData.optString("education");
+            mIsHasChronicDisease = mData.optString("illness");
+            mHasClothes = mData.optBoolean("hasClothes");
+            insurance = mData.optString("insurance");
+            mImageUrl = mData.optString("profile");
+            mSerialNumber = mData.optString("serialNb");
+
             JSONObject moufawadiyeh = mData.optJSONObject("moufawadiyeh");
             if (moufawadiyeh != null) {
                 mMoufawadyeId = moufawadiyeh.optString("_id");
@@ -182,10 +177,10 @@ public class MemberModule {
 
             }
 
-            JSONObject squad = mData.optJSONObject("squad");
-            if (squad != null) {
-                mFerkaName = squad.optString("name");
-                mFerkaId = squad.optString("_id");
+            JSONObject ferka = mData.optJSONObject("ferka");
+            if (ferka != null) {
+                mFerkaName = ferka.optString("name");
+                mFerkaId = ferka.optString("idFerka");
 
             }
 
@@ -353,12 +348,12 @@ public class MemberModule {
         this.mMoufawadyeId = mMoufawadyeId;
     }
 
-    public String getmPosition() {
-        return mPosition;
+    public String getmType() {
+        return mType;
     }
 
-    public void setmPosition(String mPosition) {
-        this.mPosition = mPosition;
+    public void setmType(String mType) {
+        this.mType = mType;
     }
 
     protected JSONObject mData;
@@ -419,12 +414,12 @@ public class MemberModule {
     }
 
 
-    public String getmRegisterNumber() {
-        return mRegisterNumber;
+    public String getmOwnNuymber() {
+        return mOwnNuymber;
     }
 
-    public void setmRegisterNumber(String mRegisterNumber) {
-        this.mRegisterNumber = mRegisterNumber;
+    public void setmOwnNuymber(String mOwnNuymber) {
+        this.mOwnNuymber = mOwnNuymber;
     }
 
     public String getmPlaceOfBirth() {
@@ -435,13 +430,6 @@ public class MemberModule {
         this.mPlaceOfBirth = mPlaceOfBirth;
     }
 
-    public String getmEmail() {
-        return mEmail;
-    }
-
-    public void setmEmail(String mEmail) {
-        this.mEmail = mEmail;
-    }
 
     public String getmDateOfBirth() {
         return mDateOfBirth;
@@ -499,13 +487,7 @@ public class MemberModule {
         this.mFhaterPhone = mFhaterPhone;
     }
 
-    public String getMfhaterBloodType() {
-        return mfhaterBloodType;
-    }
 
-    public void setMfhaterBloodType(String mfhaterBloodType) {
-        this.mfhaterBloodType = mfhaterBloodType;
-    }
 
     public String getmMotherName() {
         return mMotherName;
@@ -539,13 +521,6 @@ public class MemberModule {
         this.mMotherPhone = mMotherPhone;
     }
 
-    public String getmMotherBloodType() {
-        return mMotherBloodType;
-    }
-
-    public void setmMotherBloodType(String mMotherBloodType) {
-        this.mMotherBloodType = mMotherBloodType;
-    }
 
     public String getFamilyNb() {
         return mFamilyNb;
@@ -622,10 +597,10 @@ public class MemberModule {
 
     public String getPositionFullName() {
         String fullPositionText = Tools.getString(R.string.position_value);
-        if (mPosition.equalsIgnoreCase(LEADER)) {
+        if (mType.equalsIgnoreCase(LEADER)) {
             fullPositionText = fullPositionText + ": " + Tools.getString(R.string.leader);
         }
-        if (mPosition.equalsIgnoreCase(ONSOR)) {
+        if (mType.equalsIgnoreCase(ONSOR)) {
             fullPositionText = fullPositionText + ": " + Tools.getString(R.string.user);
         }
         return fullPositionText;

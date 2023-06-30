@@ -5,10 +5,6 @@
         android:icon="@drawable/user"
         android:title="@string/onsors" />
 
-    <item
-        android:id="@+id/homeView"
-        android:icon="@drawable/home"
-        android:title="@string/home" />
 
 
     <item

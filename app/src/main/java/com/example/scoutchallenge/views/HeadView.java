@@ -36,6 +36,7 @@ import com.example.scoutchallenge.conponents.popups.SettingsPopup;
 import com.example.scoutchallenge.helpers.AnimationHelper;
 import com.example.scoutchallenge.helpers.D;
 import com.example.scoutchallenge.helpers.Tools;
+import com.example.scoutchallenge.interfaces.OnSimplePopupDelegate;
 import com.example.scoutchallenge.models.MemberModule;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -280,7 +281,11 @@ public class HeadView extends Fragment {
     }
 
     public void showSimplePopup(String des) {
-        Tools.showSimplePopup(des);
+        showSimplePopup(des, null);
+    }
+
+    public void showSimplePopup(String des, OnSimplePopupDelegate delegate) {
+        Tools.showSimplePopup(des, delegate);
     }
 
     public void showToast(String text) {
@@ -388,6 +393,7 @@ public class HeadView extends Fragment {
     public static int getBottomNavHeightWithMargin() {
         return Tools.getBottomNavHeightWithMargin();
     }
+
     public void showHeader() {
         mHeader.setVisibility(View.VISIBLE);
         mActionBtn.show();
